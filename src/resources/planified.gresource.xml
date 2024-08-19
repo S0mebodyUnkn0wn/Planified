@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+    <gresource prefix="/planified">
+        <file preprocess="xml-stripblanks">app-window.ui</file>
+        <file preprocess="xml-stripblanks">timetable-view.ui</file>
+        <file preprocess="xml-stripblanks">home-view.ui</file>
+        <file preprocess="xml-stripblanks">newtask-dialog.ui</file>
+        <file preprocess="xml-stripblanks">task-widget.ui</file>
+        <file preprocess="xml-stripblanks">itinerary-widget-entry.ui</file>
+        <file preprocess="xml-stripblanks">task-widget-context-menu.ui</file>
+        <file preprocess="xml-stripblanks">weather-widget.ui</file>
+        <file preprocess="xml-stripblanks">upcoming-list-item.ui</file>
+        <file preprocess="xml-stripblanks">task-container.ui</file>
+        <file preprocess="xml-stripblanks">preferences-dialog.ui</file>
+        <file preprocess="xml-stripblanks">planning-view.ui</file>
+        <file preprocess="xml-stripblanks">task-list.ui</file>
+        <file>style.css</file>
+    </gresource>
+    <gresource prefix="/common">
+        <file preprocess="xml-stripblanks">date-chooser-widget.ui</file>
+    </gresource>
+
+</gresources>

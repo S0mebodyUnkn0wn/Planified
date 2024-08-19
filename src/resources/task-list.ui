@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <template class="PlanifiedTaskList" parent="GtkBox">
+        <property name="orientation">vertical</property>
+        <property name="margin-top">10</property>
+        <property name="spacing">10</property>
+        <child>
+            <object class="GtkBox" id="timetable_tasks_header">
+                <property name="spacing">10</property>
+                <property name="margin-start">10</property>
+                <child>
+                    <object class="GtkButton" id="add_task_button">
+                        <property name="vexpand">FALSE</property>
+                        <property name="icon-name">list-add</property>
+                        <property name="valign">GTK_ALIGN_CENTER</property>
+                        <property name="action-name">app.newtask</property>
+                    </object>
+                </child>
+                <child>
+                    <object class="GtkButton" id="filter_tags_button">
+                        <property name="icon-name">tag</property>
+                        <property name="vexpand">FALSE</property>
+                        <property name="valign">GTK_ALIGN_CENTER</property>
+                    </object>
+                </child>
+                <child>
+                    <object class="GtkSeparator">
+                    </object>
+                </child>
+                <child>
+                    <object class="GtkButton" id="filters_button">
+                        <property name="icon-name">view-filter</property>
+                        <property name="vexpand">FALSE</property>
+                        <property name="valign">GTK_ALIGN_CENTER</property>
+                    </object>
+                </child>
+                <child>
+                    <object class="GtkSearchEntry" id="task_searchbar">
+                        <property name="halign">GTK_ALIGN_FILL</property>
+                        <property name="hexpand">TRUE</property>
+                    </object>
+                </child>
+            </object>
+        </child>
+        <child>
+            <object class="GtkScrolledWindow" id="task_list_win">
+                <property name="vexpand">TRUE</property>
+                <property name="propagate-natural-height">TRUE</property>
+                <property name="kinetic-scrolling">TRUE</property>
+            </object>
+        </child>
+    </template>
+</interface>

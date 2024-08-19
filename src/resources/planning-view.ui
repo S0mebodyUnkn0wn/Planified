@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <template class="PlanifiedPlanningView" parent="GtkBox">
+
+        <child>
+            <object class="GtkPaned" id="planning_calendar_tasks_split">
+                <property name="halign">GTK_ALIGN_FILL</property>
+                <property name="hexpand">TRUE</property>
+                <property name="vexpand">TRUE</property>
+                <property name="shrink-end-child">FALSE</property>
+                <property name="shrink-start-child">FALSE</property>
+                <property name="position">700</property>
+                <child>
+                    <object class="GtkPaned">
+                        <property name="orientation">vertical</property>
+                        <property name="vexpand">TRUE</property>
+                        <property name="valign">GTK_ALIGN_FILL</property>
+                        <property name="position">400</property>
+                        <property name="shrink-end-child">FALSE</property>
+                        <property name="shrink-start-child">FALSE</property>
+
+                        <child>
+                            <object class="GtkCalendar" id="planning_calendar">
+                                <property name="vexpand">TRUE</property>
+
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkBox" id="planning_day_plans">
+                                <property name="margin-start">10</property>
+                                <property name="margin-end">10</property>
+                                <property name="margin-top">10</property>
+                                <property name="margin-bottom">10</property>
+                                <property name="orientation">vertical</property>
+                                <property name="vexpand">TRUE</property>
+                                <child>
+                                    <object class="GtkLabel" id="selected_day_date_label">
+                                        <property name="label">Select a day to see what you have planned for it!</property>
+                                        <property name="hexpand">FALSE</property>
+                                        <property name="xalign">0</property>
+                                        <property name="valign">0</property>
+
+                                        <style>
+                                            <class name="subtitle_text"/>
+                                        </style>
+                                    </object>
+                                </child>
+                            </object>
+                        </child>
+
+                    </object>
+                </child>
+                <child>
+                    <object class="GtkPaned">
+                        <property name="orientation">vertical</property>
+                        <property name="vexpand">TRUE</property>
+                        <property name="valign">GTK_ALIGN_FILL</property>
+                        <property name="position">600</property>
+                        <property name="shrink-end-child">FALSE</property>
+                        <property name="shrink-start-child">FALSE</property>
+                        <child>
+                            <object class="GtkBox">
+                                <child>
+                                    <object class="PlanifiedTaskList" id="planning_task_list">
+                                    </object>
+                                </child>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkBox">
+                                <property name="margin-start">10</property>
+                                <property name="margin-end">10</property>
+                                <property name="margin-top">10</property>
+                                <property name="margin-bottom">10</property>
+                                <property name="vexpand">TRUE</property>
+                                <property name="orientation">vertical</property>
+                                <child>
+                                    <object class="GtkLabel" id="details_task_title">
+                                        <property name="wrap">TRUE</property>
+                                        <property name="xalign">0</property>
+                                        <style>
+                                            <class name="subtitle_text"/>
+                                        </style>
+                                    </object>
+                                </child>
+                                <child>
+                                    <object class="GtkLabel" id="details_task_description">
+                                        <property name="wrap">TRUE</property>
+                                        <property name="xalign">0</property>
+
+                                        <style>
+                                            <class name="details_text"/>
+                                        </style>
+                                    </object>
+                                </child>
+                            </object>
+
+                        </child>
+                    </object>
+
+                </child>
+            </object>
+        </child>
+
+    </template>
+</interface>

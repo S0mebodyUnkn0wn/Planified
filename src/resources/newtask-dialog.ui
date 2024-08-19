@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <template class="NewTaskDiag" parent="GtkApplicationWindow">
+        <property name="width-request">600</property>
+        <property name="height-request">350</property>
+        <property name="title" translatable="yes">Create a new task</property>
+        <property name="resizable">1</property>
+        <property name="modal">1</property>
+        <child type="titlebar">
+            <object class="GtkHeaderBar" id="header">
+            </object>
+        </child>
+        <child>
+            <object class="GtkBox" id="content_area">
+                <property name="orientation">vertical</property>
+                <property name="hexpand">TRUE</property>
+                <property name="halign">GTK_ALIGN_FILL</property>
+                <child>
+                    <object class="GtkGrid" id="grid">
+                        <property name="hexpand">TRUE</property>
+                        <property name="halign">GTK_ALIGN_FILL</property>
+                        <property name="vexpand">TRUE</property>
+                        <property name="valign">GTK_ALIGN_FILL</property>
+                        <property name="margin-start">12</property>
+                        <property name="margin-end">12</property>
+                        <property name="margin-top">12</property>
+                        <property name="margin-bottom">12</property>
+                        <property name="row-spacing">12</property>
+                        <property name="column-spacing">12</property>
+                        <child>
+                            <object class="GtkLabel" id="task_name_label">
+                                <property name="label">_Task:</property>
+                                <property name="use-underline">1</property>
+                                <property name="xalign">1</property>
+                                <layout>
+                                    <property name="column">0</property>
+                                    <property name="row">0</property>
+                                </layout>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkEntry" id="task_name">
+                                <property name="hexpand">TRUE</property>
+                                <property name="halign">GTK_ALIGN_FILL</property>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkLabel">
+                                <property name="label">Description:</property>
+                                <layout>
+                                    <property name="column">0</property>
+                                    <property name="row">1</property>
+                                </layout>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkFrame">
+                                <property name="hexpand">TRUE</property>
+                                <property name="halign">GTK_ALIGN_FILL</property>
+                                <property name="vexpand">TRUE</property>
+                                <property name="valign">GTK_ALIGN_FILL</property>
+                                <child>
+                                    <object class="GtkScrolledWindow">
+                                        <child>
+                                            <object class="GtkTextView" id="task_description">
+                                                <property name="wrap-mode">GTK_WRAP_WORD</property>
+
+                                            </object>
+                                        </child>
+                                    </object>
+                                </child>
+                                <layout>
+                                    <property name="column">1</property>
+                                    <property name="row">1</property>
+                                </layout>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkLabel" id="task_time_label">
+                                <property name="label">Planning:</property>
+                                <property name="use-underline">1</property>
+                                <property name="xalign">1</property>
+                                <layout>
+                                    <property name="column">0</property>
+                                    <property name="row">2</property>
+                                </layout>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkBox">
+                                <property name="spacing">12</property>
+                                <child>
+                                    <object class="CommonDateChooser" id="task_deadline">
+                                        <property name="placeholder-text">Deadline (dd/mm/yyyy)</property>
+                                        <property name="hexpand">TRUE</property>
+                                        <property name="halign">GTK_ALIGN_FILL</property>
+                                    </object>
+                                </child>
+                                <child>
+                                    <object class="GtkEntry" id="task_timereq">
+                                        <property name="placeholder-text">Time to complete</property>
+                                        <property name="tooltip-text"
+                                        >Expected time required to complete the task (in minutes)
+                                        </property>
+                                        <property name="hexpand">TRUE</property>
+                                        <property name="halign">GTK_ALIGN_FILL</property>
+                                    </object>
+                                </child>
+                                <layout>
+                                    <property name="column">1</property>
+                                    <property name="row">2</property>
+                                </layout>
+                            </object>
+                        </child>
+
+                        <child>
+                            <object class="GtkLabel" id="task_misc_label">
+                                <property name="label">_Add Tags:</property>
+                                <property name="use-underline">1</property>
+                                <property name="xalign">1</property>
+                                <property name="yalign">.5</property>
+                                <layout>
+                                    <property name="column">0</property>
+                                    <property name="row">4</property>
+                                </layout>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkScrolledWindow">
+                                <!--                                <property name="vexpand">FALSE</property>-->
+                                <!--                                <property name="valign">GTK_ALIGN_FILL</property>-->
+                                <property name="vscrollbar-policy">GTK_POLICY_NEVER</property>
+                                <child>
+                                    <object class="GtkFlowBox" id="task_tags">
+                                        <property name="hexpand">FALSE</property>
+                                        <property name="vexpand">FALSE</property>
+                                        <property name="halign">GTK_ALIGN_START</property>
+                                        <property name="valign">GTK_ALIGN_START</property>
+                                        <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
+                                        <property name="selection-mode">GTK_SELECTION_NONE</property>
+
+                                    </object>
+                                </child>
+                                <style>
+                                    <!--                                    <class name="debug"/>-->
+                                </style>
+                                <layout>
+                                    <property name="column">1</property>
+                                    <property name="row">4</property>
+                                </layout>
+                            </object>
+                        </child>
+                    </object>
+                </child>
+                <child>
+                    <object class="GtkButton" id="confirm_button">
+                        <property name="margin-start">12</property>
+                        <property name="margin-end">12</property>
+                        <property name="margin-top">12</property>
+                        <property name="margin-bottom">12</property>
+                        <property name="halign">GTK_ALIGN_END</property>
+                        <property name="height-request">40</property>
+                        <property name="label">Create Task</property>
+                    </object>
+                </child>
+            </object>
+        </child>
+    </template>
+</interface>

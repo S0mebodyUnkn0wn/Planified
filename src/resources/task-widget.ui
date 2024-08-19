@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <template class="PlanifiedTaskWidget" parent="PlanifiedTaskContainer">
+        <style>
+            <class name="task_widget"/>
+        </style>
+        <property name="margin-start">10</property>
+        <property name="hexpand">TRUE</property>
+        <property name="halign">GTK_ALIGN_FILL</property>
+
+        <!--        <child>-->
+        <!--            <object class="GtkBox">-->
+        <!--                <property name="orientation">GTK_ORIENTATION_VERTICAL</property>-->
+        <!--                <child>-->
+        <!--                    <object class="GtkBox">-->
+        <child>
+            <object class="GtkCheckButton" id="complete_button"/>
+        </child>
+        <child>
+            <object class="GtkLabel" id="task_label">
+                <property name="label">Could not fetch task's name!</property>
+                <property name="halign">GTK_ALIGN_START</property>
+                <property name="hexpand">TRUE</property>
+                <property name="wrap">TRUE</property>
+                <style>
+                    <class name="task_label"/>
+                </style>
+            </object>
+        </child>
+
+        <!--                            </object>-->
+        <!--                        </child>-->
+        <!--            </object>-->
+        <!--        </child>-->
+        <child>
+            <object class="GtkScrolledWindow">
+                <property name="hexpand">TRUE</property>
+                <property name="vexpand">FALSE</property>
+                <property name="halign">GTK_ALIGN_END</property>
+                <property name="valign">GTK_ALIGN_CENTER</property>
+                <property name="propagate-natural-width">TRUE</property>
+                <property name="propagate-natural-height">TRUE</property>
+                <property name="min-content-width">100</property>
+                <child>
+                    <object class="GtkGridView" id="tag_grid">
+                        <property name="hexpand">FALSE</property>
+                        <property name="vexpand">FALSE</property>
+                        <property name="halign">GTK_ALIGN_FILL</property>
+                        <property name="valign">GTK_ALIGN_CENTER</property>
+                        <property name="orientation">GTK_ORIENTATION_HORIZONTAL</property>
+                        <style>
+                            <class name="no_background"/>
+                            <class name="tiny_font"/>
+                            <class name="add_spacing"/>
+                        </style>
+                    </object>
+                </child>
+                <!--                            <style>-->
+                <!--                                <class name="debug"/>-->
+                <!--                            </style>-->
+            </object>
+        </child>
+        <child>
+            <object class="GtkLabel" id="deadline_label">
+                <property name="label"/>
+                <property name="halign">GTK_ALIGN_END</property>
+                <property name="margin-end">10</property>
+                <property name="margin-start">10</property>
+                <style>
+                    <class name="deadline_label"/>
+                </style>
+            </object>
+        </child>
+
+        <child>
+            <object class="GtkButton" id="delete_task_button">
+                <property name="icon-name">edit-delete</property>
+                <property name="halign">GTK_ALIGN_END</property>
+                <style>
+                    <class name="delete_task_button"/>
+                </style>
+            </object>
+        </child>
+
+        <!--        <child>-->
+        <!--            <object class="GtkPopoverMenu" id="context_menu">-->
+        <!--                <property name="flags">GTK_POPOVER_MENU_SLIDING</property>-->
+        <!--                <property name="has-arrow">FALSE</property>-->
+        <!--                <property name="halign">GTK_ALIGN_START</property>-->
+        <!--                <property name="hexpand">TRUE</property>-->
+        <!--            </object>-->
+        <!--        </child>-->
+
+    </template>
+</interface>

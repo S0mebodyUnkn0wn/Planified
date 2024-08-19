@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <menu id="menu">
+        <section>
+            <item>
+                <attribute name="label">_Edit</attribute>
+                <attribute name="action">task.edit</attribute>
+            </item>
+            <item>
+                <attribute name="label">_Unschedule</attribute>
+                <attribute name="action">task.unschedule</attribute>
+            </item>
+            <item>
+                <attribute name="label">_Delete</attribute>
+                <attribute name="action">task.delete</attribute>
+            </item>
+
+        </section>
+    </menu>
+</interface>

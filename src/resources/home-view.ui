@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <template class="PlanifiedHomeView" parent="GtkBox">
+        <!--Turn this into a grid later-->
+        <property name="halign">GTK_ALIGN_FILL</property>
+        <property name="hexpand">TRUE</property>
+        <child>
+            <object class="GtkGrid">
+                <property name="halign">GTK_ALIGN_FILL</property>
+                <property name="hexpand">TRUE</property>
+                <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
+                <property name="margin-top">50</property>
+                <property name="margin-start">50</property>
+                <property name="margin-end">50</property>
+                <property name="margin-bottom">50</property>
+                <property name="row-spacing">50</property>
+                <property name="column-spacing">0</property>
+                <property name="column-homogeneous">True</property>
+                <child>
+                    <object class="GtkBox" id="home_datetime_box">
+                        <layout>
+                            <property name="column">0</property>
+                            <property name="row">0</property>
+                        </layout>
+                        <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
+                        <property name="valign">GTK_ALIGN_CENTER</property>
+                        <property name="hexpand">TRUE</property>
+                        <property name="halign">GTK_ALIGN_FILL</property>
+                        <child>
+                            <object class="GtkLabel" id="home_clock">
+                                <property name="label">00:00:00</property>
+                                <property name="width-chars">7</property>
+                                <property name="xalign">0</property>
+                                <style>
+                                    <class name="home_clock"/>
+                                </style>
+
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkLabel" id="home_date">
+                                <property name="label">no-date</property>
+                                <property name="halign">GTK_ALIGN_START</property>
+                                <property name="margin-start">10</property>
+                                <property name="margin-top">0</property>
+
+                                <style>
+                                    <class name="home_date"/>
+                                </style>
+
+                            </object>
+                        </child>
+                    </object>
+                </child>
+                <child>
+                    <object class="GtkBox">
+                        <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
+                        <property name="halign">GTK_ALIGN_START</property>
+                        <property name="hexpand">TRUE</property>
+                        <property name="valign">GTK_ALIGN_CENTER</property>
+                        <property name="vexpand">TRUE</property>
+                        <child>
+                            <object class="GtkLabel">
+                                <property name="halign">GTK_ALIGN_START</property>
+                                <property name="label">Current Task:</property>
+                                <style>
+                                    <class name="subtitle_text"/>
+                                </style>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkLabel">
+                                <property name="label">Lorem ipsum dolor sit</property>
+                                <style>
+                                    <class name="title_text"/>
+                                </style>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkLabel">
+                                <property name="halign">GTK_ALIGN_START</property>
+
+                                <property name="label">Ends at 14:20</property>
+                                <style>
+                                    <class name="details_text"/>
+                                </style>
+                            </object>
+                        </child>
+                        <layout>
+                            <property name="column">0</property>
+                            <property name="row">1</property>
+                        </layout>
+                    </object>
+
+                </child>
+                <child>
+                    <object class="GtkBox">
+                        <property name="halign">GTK_ALIGN_START</property>
+                        <property name="hexpand">TRUE</property>
+                        <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
+                        <layout>
+                            <property name="column">0</property>
+                            <property name="row">2</property>
+                        </layout>
+                        <child>
+                            <object class="GtkLabel">
+                                <property name="valign">GTK_ALIGN_END</property>
+                                <property name="halign">GTK_ALIGN_START</property>
+                                <property name="label">You have no more plans for today</property>
+                                <style>
+                                    <class name="subtitle_text"/>
+                                </style>
+
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkLinkButton">
+                                <property name="valign">GTK_ALIGN_END</property>
+                                <property name="halign">GTK_ALIGN_START</property>
+                                <property name="label">Let's plan something!</property>
+                                <style>
+                                    <class name="details_text"/>
+                                </style>
+                            </object>
+                        </child>
+                    </object>
+                </child>
+                <child>
+                    <object class="PlanifiedWeatherWidget">
+                        <property name="valign">GTK_ALIGN_CENTER</property>
+                        <property name="halign">GTK_ALIGN_END</property>
+                        <property name="hexpand">FALSE</property>
+
+                        <layout>
+                            <property name="column">1</property>
+                            <property name="row">0</property>
+                        </layout>
+                    </object>
+                </child>
+                <child>
+                    <object class="PlanifiedUpcomingList" id="upcoming">
+                        <!--                        <property name="orientation">GTK_ORIENTATION_VERTICAL</property>-->
+                        <property name="halign">GTK_ALIGN_FILL</property>
+                        <property name="valign">GTK_ALIGN_FILL</property>
+                        <property name="vexpand">TRUE</property>
+                        <!--                        <property name="hexpand">TRUE</property>-->
+                        <layout>
+                            <property name="column">1</property>
+                            <property name="row">1</property>
+                            <property name="row-span">2</property>
+                        </layout>
+                    </object>
+                </child>
+            </object>
+
+        </child>
+
+
+    </template>
+</interface>

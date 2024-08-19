@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <template class="PlanifiedWeatherWidget" parent="GtkBox">
+        <property name="spacing">20</property>
+        <child>
+            <object class="GtkImage" id="weather_icon">
+                <property name="valign">GTK_ALIGN_CENTER</property>
+                <property name="icon-name">weather-none-available-symbolic</property>
+                <style>
+                    <class name="weather_icon"/>
+                </style>
+            </object>
+        </child>
+        <child>
+            <object class="GtkLabel" id="weather_summary">
+                <property name="wrap">TRUE</property>
+                <property name="hexpand">TRUE</property>
+                <property name="valign">GTK_ALIGN_CENTER</property>
+                <property name="use-markup">TRUE</property>
+                <style>
+                    <class name="weather_text_main"/>
+                </style>
+            </object>
+        </child>
+        <child>
+            <object class="GtkLabel" id="weather_temperature">
+                <property name="valign">GTK_ALIGN_CENTER</property>
+                <property name="use-markup">TRUE</property>
+
+                <style>
+                    <class name="weather_text_large"/>
+                </style>
+            </object>
+        </child>
+
+    </template>
+</interface>

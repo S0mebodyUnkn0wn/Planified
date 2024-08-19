@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <template class="PlanifiedAppWindow" parent="GtkApplicationWindow">
+        <property name="title" translatable="yes">Planified</property>
+<!--        <property name="show-menubar">TRUE</property>-->
+        <child type="titlebar">
+            <object class="GtkHeaderBar" id="header">
+                <child type="start">
+                    <object class="GtkStackSwitcher" id="tabs">
+                        <property name="stack">stack</property>
+                        <style>
+                            <class name="linked"/>
+                        </style>
+                    </object>
+                </child>
+                <child type="end">
+                    <object class="GtkBox">
+                        <property name="spacing">10</property>
+                        <child>
+                            <object class="GtkButton">
+                                <property name="icon-name">list-add</property>
+                                <property name="action-name">app.newtask</property>
+                                <property name="tooltip-text">Add new task</property>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkButton">
+                                <property name="icon-name">gtk-preferences</property>
+                                <property name="action-name">app.preferences</property>
+                                <property name="tooltip-text">Open preferences</property>
+                            </object>
+                        </child>
+                    </object>
+
+                </child>
+            </object>
+        </child>
+        <child>
+            <object class="GtkBox" id="content_box">
+                <property name="orientation">vertical</property>
+                <child>
+                    <object class="GtkStack" id="stack"/>
+                </child>
+            </object>
+        </child>
+    </template>
+</interface>

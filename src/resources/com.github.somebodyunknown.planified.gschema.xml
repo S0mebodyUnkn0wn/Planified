@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE schemalist SYSTEM "https://gitlab.gnome.org/GNOME/glib/-/raw/HEAD/gio/gschema.dtd">
+
+<schemalist>
+  <schema path="/com/github/somebodyunknown/planified/" id="com.github.somebodyunknown.planified">
+    <key name="weather-autolocation" type="b">
+      <default>false</default>
+      <summary>Geolocation</summary>
+      <description>Whether Planified should use geolocation services to automatically find the closest weather station.</description>
+    </key>
+    <key name="weather-update-rate" type="u">
+      <default>1</default>
+      <summary>Update Rate</summary>
+      <description>How often should the weather information be updated (in seconds).</description>
+    </key>
+    <key name="weather-symbolic-icons" type="b">
+      <default>true</default>
+      <summary>Use Symbolic Icons</summary>
+      <description>Whether Planified should use symbolic icons for weather conditions instead of colorful ones.</description>
+    </key>
+    <key name="weather-location" type="(dd)">
+      <default>(0,0)</default>
+      <summary>Location</summary>
+      <description>Location for which the weather info is fetched.</description>
+    </key>
+    <key name="weather-show-station" type="b">
+      <default>true</default>
+      <summary>Show weather station?</summary>
+      <description>Whether the weather widget should show the name of the weather station providing the data.</description>
+    </key>
+  </schema>
+</schemalist>

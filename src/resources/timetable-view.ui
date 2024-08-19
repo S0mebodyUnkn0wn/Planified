@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <template class="PlanifiedTimetableView" parent="GtkBox">
+        <child>
+            <object class="GtkPaned" id="timetable_sched_task_split">
+                <property name="shrink-end-child">FALSE</property>
+                <property name="shrink-start-child">FALSE</property>
+                <property name="position">700</property>
+                <property name="vexpand">TRUE</property>
+                <child>
+                    <object class="GtkBox">
+                        <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
+                        <property name="margin-top">10</property>
+                        <property name="spacing">10</property>
+                        <child>
+                            <object class="GtkBox" id="timetable_header">
+                                <property name="spacing">10</property>
+                                <property name="hexpand">TRUE</property>
+                                <property name="halign">GTK_ALIGN_FILL</property>
+
+                                <child>
+                                    <object class="GtkButton" id="itinerary_back">
+                                        <property name="margin-start">20</property>
+                                        <property name="icon-name">go-previous</property>
+                                    </object>
+                                </child>
+                                <child>
+                                    <object class="GtkLabel" id="timetable_header_label">
+                                        <property name="label">Agenda</property>
+                                        <property name="hexpand">TRUE</property>
+                                        <property name="halign">GTK_ALIGN_FILL</property>
+<!--                                        <property name="wrap">TRUE</property>-->
+                                        <style>
+                                            <class name="heading"/>
+                                        </style>
+                                    </object>
+                                </child>
+                                <child>
+                                    <object class="GtkButton" id="itinerary_next">
+                                        <property name="margin-end">20</property>
+                                        <property name="icon-name">go-next</property>
+                                    </object>
+                                </child>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkScrolledWindow">
+                                <property name="vexpand">TRUE</property>
+                                <child>
+                                    <object class="PlanifiedItineraryWidget" id="timetable_itinerary">
+                                        <property name="valign">GTK_ALIGN_FILL</property>
+                                        <property name="vexpand">TRUE</property>
+                                        <style>
+                                            <class name="timetable-widget"/>
+                                        </style>
+                                    </object>
+                                </child>
+                            </object>
+                        </child>
+                    </object>
+                </child>
+                <child>
+                    <object class="PlanifiedTaskList" id="timetable_task_list">
+
+                    </object>
+                </child>
+            </object>
+        </child>
+    </template>
+</interface>

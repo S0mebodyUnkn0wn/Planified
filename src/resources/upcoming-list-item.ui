@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <template class="PlanifiedUpcomingListItem" parent="GtkBox">
+        <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
+        <property name="hexpand">TRUE</property>
+        <property name="halign">GTK_ALIGN_FILL</property>
+        <style>
+            <class name="upcoming_entry"/>
+        </style>
+        <child>
+            <object class="GtkLabel" id="title">
+                <property name="xalign">0</property>
+                <property name="wrap">TRUE</property>
+
+            </object>
+        </child>
+        <child>
+            <object class="GtkLabel" id="description">
+                <property name="xalign">0</property>
+                <property name="wrap">TRUE</property>
+                <style>
+                    <class name="details_text"/>
+                </style>
+            </object>
+        </child>
+    </template>
+</interface>

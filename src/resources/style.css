@@ -1,0 +1,295 @@
+
+
+
+
+window{
+    background-color: alpha(@theme_bg_color,.4);
+
+}
+
+/*.background{*/
+/*    !*color: magenta;*!*/
+/*    background-color: transparent;*/
+/*}*/
+
+list{
+    background-color: transparent;
+}
+
+.no_background{
+    background-color: transparent;
+}
+
+
+.delete_task_button{
+    border-radius: 0;
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+    border-width: 0;
+    box-shadow: 0 0 0 0 #00000000;
+    color: transparent;
+    background-image: unset;
+    background-color: transparent;
+    transition-property: background-color;
+}
+
+.home_clock{
+
+    font-size: 600%;
+    margin: 0 0 -.25em 0;
+    padding: 0;
+
+    font-weight: bold;
+    /*font-family: monospace;*/
+}
+
+.deadline_label{
+    font-style: italic;
+    font-family: sans-serif;
+    font-size: 75%;
+    /*color: gray;*/
+    opacity: .5;
+}
+
+.home_date{
+    margin: 0;
+
+    font-size: 225%;
+}
+
+.heading{
+    font-size: 200%;
+    font-weight: bold;
+}
+
+.delete_task_button image {
+    -gtk-icon-size: .75em;
+}
+
+.delete_task_button:hover{
+    background-color: @error_color;
+}
+
+.task_widget:hover .delete_task_button{
+    color: #000000FF;
+
+}
+
+.task_widget{
+    font-size: 130%;
+    /*min-height: 2em;*/
+}
+
+.task_label{
+    padding-top: .5em;
+    padding-bottom: .5em;
+
+}
+
+.task_widget check {
+    -gtk-icon-size: .8em;
+    margin-right: .5em;
+}
+
+.weather_text_main {
+    font-size: 2em;
+    /*font-family: monospace;*/
+    /*font-weight: bolder;*/
+}
+
+.weather_text_large {
+    font-size: 3em;
+    /*font-family: monospace;*/
+    font-weight: bold;
+}
+
+.weather_icon {
+    -gtk-icon-size: 10em;
+}
+
+.timetable_entry{
+    font-size: 120%;
+    font-weight: bold;
+    background-color: alpha(@theme_selected_bg_color,.2);
+    border-bottom: solid 2px alpha(@theme_fg_color,.5);
+}
+
+
+listview{
+    background-color: transparent;
+}
+
+listview row:not(.activatable){
+    background-color: transparent;
+    /*color: @theme_color_text;*/
+    animation: unset;
+    transition: unset;
+}
+
+
+.confirm-dialog-details{
+    margin: 1em;
+}
+
+.confirm-dialog-button{
+    /*font-size: 1em;*/
+    padding: .5em;
+
+}
+
+listview row:not(.activatable):active{
+    background-color: transparent;
+    animation: unset;
+    transition: unset;
+}
+
+.intext_dropdown arrow{
+    margin-left: 5px;
+}
+
+.itinerary_time_label{
+    font-family: monospace;
+    opacity: 0.8;
+
+}
+
+.itinerary_time_label_hourly{
+    font-weight: bold;
+    opacity: 1;
+}
+
+
+.debug{
+    background-color: magenta;
+}
+
+.placeholder{
+    /*background-color: @theme_selected_bg_color;*/
+    border: solid @borders 2px;
+    border-radius: 10px;
+}
+
+.home_agenda_stack{
+    border-radius: 8px 8px 0 0;
+    border-bottom: solid @borders 2px;
+    /*min-height: 4em;*/
+}
+
+.title_text{
+    font-size: 220%;
+    font-weight: 600;
+    font-style: italic;
+    color: @theme_text_color;
+
+}
+
+.subtitle_text{
+    font-size: 160%;
+    font-weight: 500;
+    color: @theme_text_color;
+    /*font-style: italic;*/
+}
+
+.upcoming_entry{
+    font-size: 140%;
+    padding: .5em;
+    margin-top: .25em;
+    margin-bottom: .25em;
+    border-radius: 20px;
+    background-color: alpha(@theme_base_color,.8);
+}
+
+.details_text{
+    font-size: 110%;
+    color: @theme_text_color;
+    opacity: .8;
+    font-weight: normal;
+
+}
+
+.confirm-dialog-button{
+    border-radius: 0;
+}
+
+
+.large_font{
+    font-size: 120%;
+}
+
+.small_font{
+    font-size: 90%;
+    -gtk-icon-size: 2em;
+
+}
+
+.tiny_font{
+    font-size: 60%;
+    -gtk-icon-size: 1.5em;
+}
+
+
+gridview.add_spacing{
+    margin: 0 .25em;
+}
+
+gridview.add_spacing child{
+    margin: .5em .25em;
+}
+
+.upcoming_entry .details_text{
+    margin-top: .25em;
+
+    font-size: 80%;
+}
+
+.inline-stack-switcher{
+    font-size: 150%;
+    font-weight: bold;
+}
+
+textview{
+    min-height: 2em;
+}
+
+.inline_icon{
+    /*margin: .5em;*/
+    /*margin-left: 0;*/
+}
+
+button.inline_button{
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+button.inline_button:hover{
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+button.inline_button:active{
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+calendar {
+    padding: .5em;
+}
+
+calendar label.other-month{
+    opacity: .25;
+}
+
+calendar header{
+    padding-bottom: .5em;
+    margin-bottom: .5em;
+
+    border-bottom: .05em solid currentColor;
+}
+
+.hide_overshoot overshoot{
+    background-image: unset;
+}
