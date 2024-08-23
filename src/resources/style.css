@@ -81,8 +81,8 @@ list{
 }
 
 .task_label{
-    padding-top: .5em;
-    padding-bottom: .5em;
+    /*padding-top: .5em;*/
+    /*padding-bottom: .5em;*/
 
 }
 
@@ -277,6 +277,10 @@ button.inline_button:active{
 
 calendar {
     padding: .5em;
+}
+
+listview.no_selection row {
+    color: @theme_text_color;
 }
 
 calendar label.other-month{

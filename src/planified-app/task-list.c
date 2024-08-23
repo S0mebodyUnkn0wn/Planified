@@ -11,13 +11,41 @@ struct _PlanifiedTaskList {
     GtkWidget *task_list_win;
     GtkWidget *filter_tags_button;
     GtkWidget *task_searchbar;
+
+    GtkWidget *filters_menu;
+    GtkWidget *filters_button;
+
     GListModel *model;
     GListModel *filtered_model;
     GListModel *sorted_model;
+    GSimpleActionGroup *filter_state;
 };
 
 G_DEFINE_FINAL_TYPE(PlanifiedTaskList, planified_task_list, GTK_TYPE_BOX)
 
+
+static void
+filter_change(GSimpleAction *action,
+              GVariant *value,
+              gpointer user_data) {
+    const gchar *name = g_action_get_name((GAction *) action);
+    PlanifiedTaskList *self = PLANIFIED_TASK_LIST(user_data);
+    g_simple_action_set_state(action, value);
+    if (g_variant_classify(value) == G_VARIANT_CLASS_BOOLEAN) {
+        gtk_filter_changed(gtk_filter_list_model_get_filter(GTK_FILTER_LIST_MODEL(self->filtered_model)),
+                           g_variant_get_boolean(value) ? GTK_FILTER_CHANGE_MORE_STRICT
+                                                        : GTK_FILTER_CHANGE_LESS_STRICT);
+    } else {
+        gtk_filter_changed(gtk_filter_list_model_get_filter(GTK_FILTER_LIST_MODEL(self->filtered_model)),
+                           GTK_FILTER_CHANGE_DIFFERENT);
+    }
+}
+
+static GActionEntry task_list_entries[] = {
+        {"hide-completed",     NULL, NULL, "true",  filter_change},
+        {"hide-not-completed", NULL, NULL, "false", filter_change},
+
+};
 
 static void
 setup_list_item(GtkListItemFactory *factory,
@@ -52,6 +80,19 @@ teardown_list_item(GtkListItemFactory *factory,
 static gboolean
 filter_func(GObject *item,
             gpointer user_data) {
+    PlanifiedTaskList *self = PLANIFIED_TASK_LIST(user_data);
+    PlanifiedTask *task = PLANIFIED_TASK(item);
+    if (g_variant_get_boolean(g_action_group_get_action_state(G_ACTION_GROUP(self->filter_state), "hide-completed"))
+        &&
+        planified_task_get_is_complete(task)) {
+        return FALSE;
+    };
+    if (g_variant_get_boolean(g_action_group_get_action_state(G_ACTION_GROUP(self->filter_state), "hide-not-completed"))
+        &&
+        !planified_task_get_is_complete(task)) {
+        return FALSE;
+    };
+
     return TRUE;
 }
 
@@ -62,23 +103,23 @@ sorter_func(gconstpointer a,
     return 0;
 }
 
-void
-planified_task_list_override_sorter(PlanifiedTaskList *self, GtkSorter *new_sorter) {
-    gtk_sort_list_model_set_sorter(GTK_SORT_LIST_MODEL(self->sorted_model), new_sorter);
-}
-
-void
-planified_task_list_override_filter(PlanifiedTaskList *self, GtkFilter *new_filter) {
-    gtk_filter_list_model_set_filter(GTK_FILTER_LIST_MODEL(self->filtered_model), new_filter);
-}
+//void
+//planified_task_list_override_sorter(PlanifiedTaskList *self, GtkSorter *new_sorter) {
+//    gtk_sort_list_model_set_sorter(GTK_SORT_LIST_MODEL(self->sorted_model), new_sorter);
+//}
+//
+//void
+//planified_task_list_override_filter(PlanifiedTaskList *self, GtkFilter *new_filter) {
+//    gtk_filter_list_model_set_filter(GTK_FILTER_LIST_MODEL(self->filtered_model), new_filter);
+//}
 
 const GtkListView *
-planified_task_list_get_list_view(PlanifiedTaskList *self){
+planified_task_list_get_list_view(PlanifiedTaskList *self) {
     return GTK_LIST_VIEW(self->list);
 }
 
 GListModel *
-planified_task_list_get_model(PlanifiedTaskList *self){
+planified_task_list_get_model(PlanifiedTaskList *self) {
     return G_LIST_MODEL(self->model);
 }
 
@@ -86,10 +127,10 @@ void
 planified_task_list_setup(PlanifiedTaskList *self) {
     GListModel *raw_model = (GListModel *) planified_app_get_tasks(get_planified_app((GtkWidget *) self));
 
-    GtkFilter *filter = (GtkFilter *) gtk_custom_filter_new((GtkCustomFilterFunc) filter_func, NULL, NULL);
+    GtkFilter *filter = (GtkFilter *) gtk_custom_filter_new((GtkCustomFilterFunc) filter_func, self, NULL);
     GListModel *filtered_model = (GListModel *) gtk_filter_list_model_new(raw_model, filter);
 
-    GtkSorter *sorter = (GtkSorter *) gtk_custom_sorter_new((GCompareDataFunc) sorter_func, NULL, NULL);
+    GtkSorter *sorter = (GtkSorter *) gtk_custom_sorter_new((GCompareDataFunc) sorter_func, self, NULL);
     GListModel *sorted_model = (GListModel *) gtk_sort_list_model_new(filtered_model, sorter);
 
     self->filtered_model = filtered_model;
@@ -117,10 +158,25 @@ planified_task_list_init(PlanifiedTaskList *self) {
     g_signal_connect (item_factory, "unbind", G_CALLBACK(unbind_list_item), NULL);
     g_signal_connect (item_factory, "teardown", G_CALLBACK(teardown_list_item), NULL);
 
+//    g_signal_connect_swapped()
+
+    self->filter_state = g_simple_action_group_new();
+    g_action_map_add_action_entries(G_ACTION_MAP(self->filter_state), task_list_entries,
+                                    G_N_ELEMENTS(task_list_entries), self);
+
+    gtk_widget_insert_action_group(GTK_WIDGET(self), "tasklist", G_ACTION_GROUP(self->filter_state));
+
+    GtkBuilder *builder = gtk_builder_new_from_resource("/planified/filter-popup-menu.ui");
+    gtk_menu_button_set_menu_model(GTK_MENU_BUTTON(self->filters_button),
+                                   G_MENU_MODEL(gtk_builder_get_object(builder, "filter-menu")));
+    g_object_unref(builder);
+
     self->list = gtk_list_view_new(NULL, item_factory);
+    gtk_widget_add_css_class(self->list, "rich-list");
     gtk_scrollable_set_vscroll_policy((GtkScrollable *) self->list, GTK_SCROLL_NATURAL);
 
     gtk_scrolled_window_set_child((GtkScrolledWindow *) self->task_list_win, self->list);
+
 }
 
 
@@ -130,6 +186,8 @@ planified_task_list_class_init(PlanifiedTaskListClass *class) {
                                                 "/planified/task-list.ui");
 
     gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), PlanifiedTaskList, task_list_win);
+//    gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), PlanifiedTaskList, filters_menu);
+    gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), PlanifiedTaskList, filters_button);
 
 
 }

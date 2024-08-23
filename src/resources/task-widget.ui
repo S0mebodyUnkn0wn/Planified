@@ -4,7 +4,7 @@
         <style>
             <class name="task_widget"/>
         </style>
-        <property name="margin-start">10</property>
+<!--        <property name="margin-start">10</property>-->
         <property name="hexpand">TRUE</property>
         <property name="halign">GTK_ALIGN_FILL</property>
 

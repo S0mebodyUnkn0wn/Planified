@@ -13,6 +13,8 @@
         <file preprocess="xml-stripblanks">preferences-dialog.ui</file>
         <file preprocess="xml-stripblanks">planning-view.ui</file>
         <file preprocess="xml-stripblanks">task-list.ui</file>
+        <file preprocess="xml-stripblanks">plan-dialog.ui</file>
+        <file preprocess="xml-stripblanks">filter-popup-menu.ui</file>
         <file preprocess="xml-stripblanks">context-menus.ui</file>
         <file>style.css</file>
     </gresource>

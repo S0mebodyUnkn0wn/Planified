@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <menu id="filter-menu">
+        <section>
+            <item>
+                <attribute name="label">_Hide completed</attribute>
+                <attribute name="action">tasklist.hide-completed</attribute>
+            </item>
+            <item>
+                <attribute name="label">_Hide not completed</attribute>
+                <attribute name="action">tasklist.hide-not-completed</attribute>
+            </item>
+
+        </section>
+
+    </menu>
+</interface>
