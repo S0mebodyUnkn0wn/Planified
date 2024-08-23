@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <menu id="task-context-menu">
+        <section>
+            <item>
+                <attribute name="label">_Edit</attribute>
+                <attribute name="action">task.edit</attribute>
+            </item>
+            <item>
+                <attribute name="label">_Plan</attribute>
+                <attribute name="action">task.plan</attribute>
+            </item>
+            <item>
+                <attribute name="label">_Schedule</attribute>
+                <attribute name="action">task.schedule</attribute>
+            </item>
+            <item>
+                <attribute name="label">_Unschedule</attribute>
+                <attribute name="action">task.unschedule</attribute>
+            </item>
+            <item>
+                <attribute name="label">_Delete</attribute>
+                <attribute name="action">task.delete</attribute>
+            </item>
+
+        </section>
+    </menu>
+    <menu id="win-context-menu">
+        <section>
+            <submenu>
+                <attribute name="label">Go to</attribute>
+                <item>
+                    <attribute name="label">_Home view</attribute>
+                    <attribute name="action">win.go-to</attribute>
+                    <attribute name="target">Home</attribute>
+                </item>
+                <item>
+                    <attribute name="label">_Timetable view</attribute>
+                    <attribute name="action">win.go-to</attribute>
+                    <attribute name="target">Timetable</attribute>
+                </item>
+                <item>
+                    <attribute name="label">_Planning view</attribute>
+                    <attribute name="action">win.go-to</attribute>
+                    <attribute name="target">Planning</attribute>
+                </item>
+                <item>
+                    <attribute name="label">_Tasks view</attribute>
+                    <attribute name="action">win.go-to</attribute>
+                    <attribute name="target">Tasks</attribute>
+                </item>
+            </submenu>
+        </section>
+        <section>
+            <item>
+                <attribute name="label">_Quit planified</attribute>
+                <attribute name="action">app.quit</attribute>
+            </item>
+        </section>
+    </menu>
+</interface>

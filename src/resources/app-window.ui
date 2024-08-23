@@ -41,6 +41,14 @@
                 <child>
                     <object class="GtkStack" id="stack"/>
                 </child>
+                <child>
+                    <object class="GtkPopoverMenu" id="context_menu">
+                        <property name="flags">GTK_POPOVER_MENU_NESTED</property>
+                        <property name="has-arrow">FALSE</property>
+                        <property name="halign">GTK_ALIGN_START</property>
+                        <property name="hexpand">TRUE</property>
+                    </object>
+                </child>
             </object>
         </child>
     </template>

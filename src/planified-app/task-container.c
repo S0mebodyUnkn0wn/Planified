@@ -152,12 +152,15 @@ planified_task_container_init(PlanifiedTaskContainer *self) {
     GtkDragSource *dragSource = gtk_drag_source_new();
     GtkGesture *right_click = gtk_gesture_click_new();
     gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(right_click), GDK_BUTTON_SECONDARY);
-    GtkBuilder *builder = gtk_builder_new_from_resource("/planified/task-widget-context-menu.ui");
+    GtkBuilder *builder = gtk_builder_new_from_resource("/planified/context-menus.ui");
+    GMenu *menu = g_menu_new();
+    g_menu_append_section(menu,NULL,G_MENU_MODEL(gtk_builder_get_object(builder, "task-context-menu")));
+    g_menu_append_section(menu,NULL,G_MENU_MODEL(gtk_builder_get_object(builder, "win-context-menu")));
     gtk_popover_menu_set_menu_model((GtkPopoverMenu *) priv->context_menu,
-                                    G_MENU_MODEL(gtk_builder_get_object(builder, "menu")));
+                                    G_MENU_MODEL(menu));
     g_object_unref(builder);
 
-    g_signal_connect(right_click, "released", G_CALLBACK(context_menu_popup), GTK_POPOVER(priv->context_menu));
+    g_signal_connect(right_click, "pressed", G_CALLBACK(context_menu_popup), GTK_POPOVER(priv->context_menu));
     g_signal_connect(dragSource, "prepare", G_CALLBACK(planified_task_container_on_drag_prepare), self);
     g_signal_connect(dragSource, "drag-begin", G_CALLBACK(planified_task_container_on_drag_begin), self);
 
