@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-    <template class="NewTaskDiag" parent="GtkApplicationWindow">
+    <template class="PlanifiedNewentryDialog" parent="GtkApplicationWindow">
         <property name="width-request">600</property>
         <property name="height-request">350</property>
         <property name="title" translatable="yes">Create a new task</property>

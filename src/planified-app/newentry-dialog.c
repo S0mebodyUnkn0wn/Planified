@@ -211,7 +211,7 @@ dispose(GObject *gobject) {
 
 static void
 planified_newentry_dialog_class_init(PlanifiedNewentryDialogClass *class) {
-    gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), "/planified/newtask-dialog.ui");
+    gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), "/planified/newentry-dialog.ui");
 
     gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), PlanifiedNewentryDialog, task_name);
     gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), PlanifiedNewentryDialog, task_deadline);
