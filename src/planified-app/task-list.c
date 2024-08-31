@@ -33,8 +33,8 @@ filter_change(GSimpleAction *action,
     g_simple_action_set_state(action, value);
     if (g_variant_classify(value) == G_VARIANT_CLASS_BOOLEAN) {
         gtk_filter_changed(gtk_filter_list_model_get_filter(GTK_FILTER_LIST_MODEL(self->filtered_model)),
-                           g_variant_get_boolean(value) ? GTK_FILTER_CHANGE_MORE_STRICT
-                                                        : GTK_FILTER_CHANGE_LESS_STRICT);
+                           g_variant_get_boolean(value) ? GTK_FILTER_CHANGE_LESS_STRICT
+                                                        : GTK_FILTER_CHANGE_MORE_STRICT);
     } else {
         gtk_filter_changed(gtk_filter_list_model_get_filter(GTK_FILTER_LIST_MODEL(self->filtered_model)),
                            GTK_FILTER_CHANGE_DIFFERENT);
@@ -42,8 +42,8 @@ filter_change(GSimpleAction *action,
 }
 
 static GActionEntry task_list_entries[] = {
-        {"hide-completed",     NULL, NULL, "true",  filter_change},
-        {"hide-not-completed", NULL, NULL, "false", filter_change},
+        {"show-completed",     NULL, NULL, "false", filter_change},
+        {"show-not-completed", NULL, NULL, "true",  filter_change},
 
 };
 
@@ -82,12 +82,14 @@ filter_func(GObject *item,
             gpointer user_data) {
     PlanifiedTaskList *self = PLANIFIED_TASK_LIST(user_data);
     PlanifiedTask *task = PLANIFIED_TASK(item);
-    if (g_variant_get_boolean(g_action_group_get_action_state(G_ACTION_GROUP(self->filter_state), "hide-completed"))
+    if (!g_variant_get_boolean(
+            g_action_group_get_action_state(G_ACTION_GROUP(self->filter_state), "show-completed"))
         &&
         planified_task_get_is_complete(task)) {
         return FALSE;
     };
-    if (g_variant_get_boolean(g_action_group_get_action_state(G_ACTION_GROUP(self->filter_state), "hide-not-completed"))
+    if (!g_variant_get_boolean(
+            g_action_group_get_action_state(G_ACTION_GROUP(self->filter_state), "show-not-completed"))
         &&
         !planified_task_get_is_complete(task)) {
         return FALSE;

@@ -3,14 +3,19 @@
     <menu id="filter-menu">
         <section>
             <item>
-                <attribute name="label">_Hide completed</attribute>
-                <attribute name="action">tasklist.hide-completed</attribute>
+                <attribute name="label">Show _completed</attribute>
+                <attribute name="action">tasklist.show-completed</attribute>
             </item>
             <item>
-                <attribute name="label">_Hide not completed</attribute>
-                <attribute name="action">tasklist.hide-not-completed</attribute>
+                <attribute name="label">Show _not completed</attribute>
+                <attribute name="action">tasklist.show-not-completed</attribute>
             </item>
-
+        </section>
+        <section>
+            <item>
+                <attribute name="label">Show only _relevant</attribute>
+                <attribute name="action">tasklist.show-only-relevant</attribute>
+            </item>
         </section>
 
     </menu>
