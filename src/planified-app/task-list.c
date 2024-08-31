@@ -61,6 +61,7 @@ bind_list_item(GtkListItemFactory *factory,
 
     PlanifiedTask *task = gtk_list_item_get_item(list_item);
     PlanifiedTaskWidget *taskWidget = PLANIFIED_TASK_WIDGET(gtk_list_item_get_child(list_item));
+
     g_object_set(taskWidget, "task", task, NULL);
 }
 
@@ -138,8 +139,6 @@ planified_task_list_setup(PlanifiedTaskList *self) {
     self->filtered_model = filtered_model;
     self->sorted_model = sorted_model;
     self->model = (GListModel *) gtk_single_selection_new(sorted_model);
-    gtk_single_selection_set_can_unselect((GtkSingleSelection *) self->model, TRUE);
-    gtk_single_selection_set_autoselect((GtkSingleSelection *) self->model, FALSE);
     gtk_list_view_set_model((GtkListView *) self->list, (GtkSelectionModel *) self->model);
 
     gtk_scrolled_window_set_vadjustment((GtkScrolledWindow *) self->task_list_win, 0);

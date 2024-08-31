@@ -246,6 +246,8 @@ planified_upcoming_list_init(PlanifiedUpcomingList *self) {
     g_signal_connect (header_factory, "teardown", G_CALLBACK(teardown_list_header), NULL);
 
     self->upcoming_list = gtk_list_view_new(NULL, item_factory);
+    gtk_widget_add_css_class(self->upcoming_list, "no_selection");
+
     gtk_list_view_set_header_factory((GtkListView *) self->upcoming_list, header_factory);
     gtk_scrollable_set_vscroll_policy((GtkScrollable *) self->upcoming_list, GTK_SCROLL_NATURAL);
 

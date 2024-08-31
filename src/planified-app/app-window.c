@@ -110,7 +110,7 @@ planified_app_window_class_init(PlanifiedAppWindowClass *class) {
 }
 
 void
-planified_app_window_setup(PlanifiedAppWindow *self){
+planified_app_window_setup(PlanifiedAppWindow *self) {
     planified_home_view_setup(self->home);
     planified_timetable_view_setup(self->timetable);
     planified_planning_view_setup(self->planning);
@@ -119,7 +119,8 @@ planified_app_window_setup(PlanifiedAppWindow *self){
 
 PlanifiedAppWindow *
 planified_app_window_new(PlanifiedApp *app) {
-    PlanifiedAppWindow *self = g_object_new(PLANIFIED_APP_WINDOW_TYPE, "application", app, "default-height", 900, "default-width",1400 ,NULL);
+    PlanifiedAppWindow *self = g_object_new(PLANIFIED_APP_WINDOW_TYPE, "application", app, "default-height", 900,
+                                            "default-width", 1400, NULL);
 //    planified_timetable_view_reload_data(self->timetable); // Populate timetable view with tasks
 //    sqlite3_update_hook(planified_app_get_db_handle(app),planified_timetable_schedule_update,self->timetable);
 //    g_signal_connect(app,"task-array-updated",(GCallback) planified_timetable_view_update_row,self->timetable);

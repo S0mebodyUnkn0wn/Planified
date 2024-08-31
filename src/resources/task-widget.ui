@@ -71,7 +71,6 @@
                 </style>
             </object>
         </child>
-
         <child>
             <object class="GtkButton" id="delete_task_button">
                 <property name="icon-name">edit-delete</property>

@@ -26,7 +26,7 @@ update_label_text(GObject *_task, GParamSpec *pspec, gpointer _label) {
     PlanifiedTask *task = PLANIFIED_TASK(_task);
     if (strcmp(pspec->name, "task-text") == 0)
         gtk_label_set_label(label, planified_task_get_task_text(task));
-    if (strcmp(pspec->name, "description") == 0)
+    else if (strcmp(pspec->name, "description") == 0)
         gtk_label_set_label(label, planified_task_get_description(task));
 }
 

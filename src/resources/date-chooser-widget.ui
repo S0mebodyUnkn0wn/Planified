@@ -2,7 +2,7 @@
 <interface>
     <template class="CommonDateChooser" parent="GtkEntry">
         <property name="secondary-icon-name">pan-down-symbolic</property>
-        <property name="placeholder-text">Deadline dd/mm/yyyy</property>
+        <property name="placeholder-text">dd/mm/yyyy</property>
         <property name="input-hints">no-emoji</property>
         <child>
             <object class="GtkPopover" id="date_selector_popover">

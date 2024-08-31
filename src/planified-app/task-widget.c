@@ -48,9 +48,9 @@ bind_list_item(GtkListItemFactory *factory,
     PlanifiedTag *tag = gtk_list_item_get_item(list_item);
 
     widget = (GtkWidget *) planified_tag_container_new(tag, FALSE);
-    gtk_widget_set_vexpand(widget,TRUE);
-    gtk_widget_set_valign(widget,GTK_ALIGN_CENTER);
-    gtk_widget_set_halign(widget,GTK_ALIGN_END);
+    gtk_widget_set_vexpand(widget, TRUE);
+    gtk_widget_set_valign(widget, GTK_ALIGN_CENTER);
+    gtk_widget_set_halign(widget, GTK_ALIGN_END);
 
     gtk_list_item_set_child(list_item, widget);
 //    g_print("bound\n");
@@ -124,12 +124,13 @@ planified_task_widget_init(PlanifiedTaskWidget *widget) {
     g_signal_connect (item_factory, "bind", G_CALLBACK(bind_list_item), NULL);
     g_signal_connect (item_factory, "unbind", G_CALLBACK(unbind_list_item), NULL);
     g_signal_connect (item_factory, "teardown", G_CALLBACK(teardown_list_item), NULL);
-    gtk_grid_view_set_factory(widget->tag_grid,item_factory);
+    gtk_grid_view_set_factory(widget->tag_grid, item_factory);
 //    gtk_scrollable_set_vscroll_policy((GtkScrollable *) widget->tag_grid, GTK_SCROLL_NATURAL);
 
 
     g_signal_connect(widget->complete_button, "toggled", G_CALLBACK(toggle_task_completeness), widget);
-    g_signal_connect_swapped(widget->delete_task_button,"clicked",G_CALLBACK(planified_task_container_request_delete),widget);
+    g_signal_connect_swapped(widget->delete_task_button, "clicked", G_CALLBACK(planified_task_container_request_delete),
+                             widget);
 
 }
 
