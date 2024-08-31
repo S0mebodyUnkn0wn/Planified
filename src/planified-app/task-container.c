@@ -59,7 +59,7 @@ unschedule_task(GSimpleAction *action,
                 gpointer self) {
     PlanifiedTaskContainerPrivate *priv = planified_task_container_get_instance_private(self);
     PlanifiedTask *task = priv->task;
-    planified_task_set_schedule(task, -1);
+    planified_task_set_schedule(task, NULL);
     database_update_task(get_handle(self), task, 0);
 }
 
@@ -99,8 +99,8 @@ void planified_task_container_request_delete(PlanifiedTaskContainer *self) {
             planified_task_get_task_text(planified_task_container_get_task(self)));
     GtkWindow *win = GTK_WINDOW(gtk_widget_get_ancestor((GtkWidget *) self, GTK_TYPE_WINDOW));
     CommonConfirmDialog *del_alert = common_confirm_dialog_new(win, "Cancel", "Delete", "Are You Sure?", detail);
-    common_confirm_dialog_set_destructive_action(del_alert,TRUE);
-    common_confirm_dialog_connect_confirm_callback(del_alert,G_CALLBACK(planified_task_container_delete_task),self);
+    common_confirm_dialog_set_destructive_action(del_alert, TRUE);
+    common_confirm_dialog_connect_confirm_callback(del_alert, G_CALLBACK(planified_task_container_delete_task), self);
 
     gtk_window_present((GtkWindow *) del_alert);
 }

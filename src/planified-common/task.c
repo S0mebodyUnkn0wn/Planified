@@ -36,15 +36,15 @@ struct _PlanifiedTask {
     GObject parent;
 
     gchararray task_text;
-    gint64 deadline;
+    GDateTime *deadline;
     gint time_req;
     GListStore *tags;
     gchararray location;
-    gint64 schedule;
+    GDateTime *schedule;
     gboolean is_complete;
     gint64 rowid;
     gchararray description;
-    gint64 plan_start;
+    GDateTime *plan_start;
     gint plan_span;
     gint tag_count;
 };
@@ -64,7 +64,9 @@ planified_task_set_property(GObject *object,
             self->task_text = g_value_dup_string(value);
             break;
         case DEADLINE:
-            self->deadline = g_value_get_int64(value);
+            if (self->deadline)
+                g_date_time_unref(self->deadline);
+            self->deadline = g_value_get_pointer(value);
             break;
         case TIME_REQ:
             self->time_req = g_value_get_int(value);
@@ -81,7 +83,9 @@ planified_task_set_property(GObject *object,
             }
             break;
         case SCHEDULE:
-            self->schedule = g_value_get_int64(value);
+            if (self->schedule)
+                g_date_time_unref(self->schedule);
+            self->schedule = g_value_get_pointer(value);
             break;
         case IS_COMPLETE:
             self->is_complete = g_value_get_boolean(value);
@@ -97,7 +101,9 @@ planified_task_set_property(GObject *object,
             }
             break;
         case PLAN_START:
-            self->plan_start = g_value_get_int64(value);
+            if (self->plan_start)
+                g_date_time_unref(self->plan_start);
+            self->plan_start = g_value_get_pointer(value);
             break;
         case PLAN_SPAN:
             self->plan_span = g_value_get_int(value);
@@ -125,7 +131,7 @@ planified_task_get_property(GObject *object,
             g_value_set_string(value, self->task_text);
             break;
         case DEADLINE:
-            g_value_set_int64(value, self->deadline);
+            g_value_set_pointer(value, self->deadline);
             break;
         case TIME_REQ:
             g_value_set_int(value, self->time_req);
@@ -137,7 +143,7 @@ planified_task_get_property(GObject *object,
             g_value_set_string(value, self->location);
             break;
         case SCHEDULE:
-            g_value_set_int64(value, self->schedule);
+            g_value_set_pointer(value, self->schedule);
             break;
         case IS_COMPLETE:
             g_value_set_boolean(value, self->is_complete);
@@ -149,7 +155,7 @@ planified_task_get_property(GObject *object,
             g_value_set_string(value, self->location);
             break;
         case PLAN_START:
-            g_value_set_int64(value, self->plan_start);
+            g_value_set_pointer(value, self->plan_start);
             break;
         case PLAN_SPAN:
             g_value_set_int(value, self->plan_span);
@@ -168,6 +174,14 @@ static void
 planified_task_dispose(GObject *gobject) {
 //    g_print("Called dispose for task \"%s\"\n", planified_task_get_task_text((PlanifiedTask *) gobject));
     g_signal_emit(gobject, obj_signals[TASK_DELETED], 0);
+    PlanifiedTask *self = PLANIFIED_TASK(gobject);
+    if (self->deadline)
+        g_date_time_unref(self->deadline);
+    if (self->plan_start)
+        g_date_time_unref(self->plan_start);
+    if (self->schedule)
+        g_date_time_unref(self->schedule);
+
     G_OBJECT_CLASS (planified_task_parent_class)->dispose(gobject);
 }
 
@@ -194,13 +208,10 @@ planified_task_class_init(PlanifiedTaskClass *class) {
                                 NULL,
                                 G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
     obj_properties[DEADLINE] =
-            g_param_spec_int64("deadline",
-                               "Deadline",
-                               "The deadline of the task",
-                               -1,
-                               INT64_MAX,
-                               -1,
-                               G_PARAM_READWRITE);
+            g_param_spec_pointer("deadline",
+                                 "Deadline",
+                                 "The pointer to GDateTime of the deadline of the task",
+                                 G_PARAM_READWRITE);
     obj_properties[TIME_REQ] =
             g_param_spec_int("time-req",
                              "Time requirement",
@@ -222,13 +233,10 @@ planified_task_class_init(PlanifiedTaskClass *class) {
                                 "",
                                 G_PARAM_READWRITE);
     obj_properties[SCHEDULE] =
-            g_param_spec_int64("schedule",
-                               "Schedule",
-                               "NOT IMPLEMENTED",
-                               -1,
-                               INT64_MAX,
-                               -1,
-                               G_PARAM_READWRITE);
+            g_param_spec_pointer("schedule",
+                                 "Schedule",
+                                 "The pointer to GDateTime of the exact time the task is scheduled to start (NULL if task is unscheduled)",
+                                 G_PARAM_READWRITE);
     obj_properties[IS_COMPLETE] =
             g_param_spec_boolean("is-complete",
                                  "Is complete",
@@ -251,13 +259,10 @@ planified_task_class_init(PlanifiedTaskClass *class) {
                                 "",
                                 G_PARAM_READWRITE);
     obj_properties[PLAN_START] =
-            g_param_spec_int64("plan-start",
-                               "Plan Start",
-                               "The first date the task is planned for",
-                               -1,
-                               INT64_MAX,
-                               -1,
-                               G_PARAM_READWRITE);
+            g_param_spec_pointer("plan-start",
+                                 "Plan Start",
+                                 "The pointer to GDateTime of the first date the task is planned for (NULL if task is unplanned)",
+                                 G_PARAM_READWRITE);
     obj_properties[PLAN_SPAN] =
             g_param_spec_int("plan-span",
                              "Plan Span",
@@ -299,7 +304,7 @@ long long int planified_task_get_rowid(PlanifiedTask *self) {
     return self->rowid;
 }
 
-gint64 planified_task_get_deadline(PlanifiedTask *self) {
+GDateTime *planified_task_get_deadline(PlanifiedTask *self) {
     return self->deadline;
 }
 
@@ -307,11 +312,11 @@ gint planified_task_get_timereq(PlanifiedTask *self) {
     return self->time_req;
 }
 
-gint64 planified_task_get_schedule(PlanifiedTask *self) {
+GDateTime *planified_task_get_schedule(PlanifiedTask *self) {
     return self->schedule;
 }
 
-gint64 planified_task_get_plan_start(PlanifiedTask *self) {
+GDateTime *planified_task_get_plan_start(PlanifiedTask *self) {
     return self->plan_start;
 }
 
@@ -344,39 +349,23 @@ planified_task_get_tags(PlanifiedTask *self) {
 void planified_task_set_task_text(PlanifiedTask *self, gchar *task_text) {
     if (g_strcmp0(planified_task_get_task_text(self), task_text) == 0)
         return;
-    GValue val = G_VALUE_INIT;
-    g_value_init(&val, G_TYPE_STRING);
-    g_value_set_string(&val, task_text);
-    g_object_set_property(G_OBJECT(self), "task-text", &val);
-    g_value_unset(&val);
+    g_object_set(G_OBJECT(self), "task-text", task_text, NULL);
 }
 
-void planified_task_set_deadline(PlanifiedTask *self, gint64 deadline) {
+void planified_task_set_deadline(PlanifiedTask *self, GDateTime *deadline) {
     if (planified_task_get_deadline(self) == deadline)
         return;
-    GValue val = G_VALUE_INIT;
-    g_value_init(&val, G_TYPE_INT64);
-    g_value_set_int64(&val, deadline);
-    g_object_set_property(G_OBJECT(self), "deadline", &val);
-    g_value_unset(&val);
+    g_object_set(self, "deadline", deadline);
 }
 
 void planified_task_set_time_req(PlanifiedTask *self, gint time_req) {
     if (planified_task_get_timereq(self) == time_req)
         return;
-    GValue val = G_VALUE_INIT;
-    g_value_init(&val, G_TYPE_INT);
-    g_value_set_int(&val, time_req);
-    g_object_set_property(G_OBJECT(self), "time-req", &val);
-    g_value_unset(&val);
+    g_object_set(G_OBJECT(self), "time-req", time_req, NULL);
 }
 
 void planified_task_set_tags(PlanifiedTask *self, GListStore *tags) {
-    GValue val = G_VALUE_INIT;
-    g_value_init(&val, G_TYPE_LIST_STORE);
-    g_value_set_object(&val, tags);
-    g_object_set_property(G_OBJECT(self), "tags", &val);
-    g_value_unset(&val);
+    g_object_set(G_OBJECT(self), "tags", tags, NULL);
 }
 
 void planified_task_replace_tags_from_store(PlanifiedTask *self, GListStore *tags) {
@@ -391,21 +380,16 @@ void planified_task_replace_tags_from_store(PlanifiedTask *self, GListStore *tag
 void planified_task_set_location(PlanifiedTask *self, gchar *location) {
     if (g_strcmp0(planified_task_get_location(self), location) == 0)
         return;
-    GValue val = G_VALUE_INIT;
-    g_value_init(&val, G_TYPE_STRING);
-    g_value_set_string(&val, location);
-    g_object_set_property(G_OBJECT(self), "location", &val);
-    g_value_unset(&val);
+    g_object_set(G_OBJECT(self), "location", location, NULL);
 }
 
-void planified_task_set_schedule(PlanifiedTask *self, gint64 start_time) {
+/*
+ * Takes ownership of start_time
+ */
+void planified_task_set_schedule(PlanifiedTask *self, GDateTime *start_time) {
     if (planified_task_get_schedule(self) == start_time)
         return;
-    GValue val = G_VALUE_INIT;
-    g_value_init(&val, G_TYPE_INT64);
-    g_value_set_int64(&val, start_time);
-    g_object_set_property(G_OBJECT(self), "schedule", &val);
-    g_value_unset(&val);
+    g_object_set(self, "schedule", start_time, NULL);
 }
 
 /*
@@ -416,64 +400,44 @@ void planified_task_set_schedule(PlanifiedTask *self, gint64 start_time) {
 void planified_task_set_rowid(PlanifiedTask *self, gint64 rowid) {
     if (planified_task_get_rowid(self) == rowid)
         return;
-    GValue val = G_VALUE_INIT;
-    g_value_init(&val, G_TYPE_INT64);
-    g_value_set_int64(&val, rowid);
-    g_object_set_property(G_OBJECT(self), "rowid", &val);
-    g_value_unset(&val);
+    g_object_set(G_OBJECT(self), "rowid", rowid, NULL);
 }
 
-void planified_task_set_plan_start(PlanifiedTask *self, gint64 plan_start) {
+void planified_task_set_plan_start(PlanifiedTask *self, GDateTime *plan_start) {
     if (planified_task_get_plan_start(self) == plan_start)
         return;
-    GValue val = G_VALUE_INIT;
-    g_value_init(&val, G_TYPE_INT64);
-    g_value_set_int64(&val, plan_start);
-    g_object_set_property(G_OBJECT(self), "plan-start", &val);
-    g_value_unset(&val);
+    g_object_set(self, "plan-start", plan_start, NULL);
 }
 
 void planified_task_set_plan_span(PlanifiedTask *self, gint plan_span) {
     if (planified_task_get_plan_span(self) == plan_span)
         return;
-    GValue val = G_VALUE_INIT;
-    g_value_init(&val, G_TYPE_INT);
-    g_value_set_int(&val, plan_span);
-    g_object_set_property(G_OBJECT(self), "plan-span", &val);
-    g_value_unset(&val);
+    g_object_set(G_OBJECT(self), "plan-span", plan_span, NULL);
 }
 
 void planified_task_set_is_complete(PlanifiedTask *self, gboolean is_complete) {
     if (planified_task_get_is_complete(self) == is_complete)
         return;
-    GValue val = G_VALUE_INIT;
-    g_value_init(&val, G_TYPE_BOOLEAN);
-    g_value_set_boolean(&val, is_complete);
-    g_object_set_property(G_OBJECT(self), "is_complete", &val);
-    g_value_unset(&val);
+    g_object_set(G_OBJECT(self), "is_complete", is_complete, NULL);
 }
 
 void planified_task_set_description(PlanifiedTask *self, gchar *description) {
     if (g_strcmp0(planified_task_get_description(self), description) == 0)
         return;
-    GValue val = G_VALUE_INIT;
-    g_value_init(&val, G_TYPE_STRING);
-    g_value_set_string(&val, description);
-    g_object_set_property(G_OBJECT(self), "description", &val);
-    g_value_unset(&val);
+    g_object_set(G_OBJECT(self), "description", description, NULL);
 }
 
 PlanifiedTask *
 planified_task_new(char *task_text,
-                   long long int deadline,
+                   GDateTime *deadline,
                    int time_req,
                    GListStore *tags,
                    char *location,
-                   long long int schedule,
+                   GDateTime *schedule,
                    bool is_complete,
                    long long int rowid,
                    char *description,
-                   gint64 plan_start,
+                   GDateTime *plan_start,
                    gint plan_span) {
 
     return g_object_new(PLANIFIED_TASK_TYPE,
@@ -494,13 +458,13 @@ planified_task_new(char *task_text,
 
 void planified_task_update_from_sqlite3(PlanifiedTask *self, sqlite3_stmt *fetch_task_stmt) {
     planified_task_set_task_text(self, sqlite3_column_text(fetch_task_stmt, 1));
-    planified_task_set_deadline(self, sqlite3_column_int64(fetch_task_stmt, 2));
+    planified_task_set_deadline(self, MAKE_DATETIME(sqlite3_column_int64(fetch_task_stmt, 2)));
     planified_task_set_time_req(self, sqlite3_column_int(fetch_task_stmt, 3));
     planified_task_set_location(self, sqlite3_column_text(fetch_task_stmt, 4));
-    planified_task_set_schedule(self, sqlite3_column_int64(fetch_task_stmt, 5));
+    planified_task_set_schedule(self, MAKE_DATETIME(sqlite3_column_int64(fetch_task_stmt, 5)));
     planified_task_set_is_complete(self, sqlite3_column_int(fetch_task_stmt, 6));
     planified_task_set_description(self, sqlite3_column_text(fetch_task_stmt, 7));
-    planified_task_set_plan_start(self, sqlite3_column_int64(fetch_task_stmt, 8));
+    planified_task_set_plan_start(self, MAKE_DATETIME(sqlite3_column_int64(fetch_task_stmt, 8)));
     planified_task_set_plan_span(self, sqlite3_column_int(fetch_task_stmt, 9));
     self->tag_count = sqlite3_column_int(fetch_task_stmt, 10);
 }
@@ -511,13 +475,13 @@ planified_task_new_from_sqlite(sqlite3_stmt *fetch_task_stmt) {
             PLANIFIED_TASK_TYPE,
             "rowid", sqlite3_column_int64(fetch_task_stmt, 0),
             "task-text", sqlite3_column_text(fetch_task_stmt, 1),
-            "deadline", sqlite3_column_int64(fetch_task_stmt, 2),
+            "deadline", MAKE_DATETIME(sqlite3_column_int64(fetch_task_stmt, 2)),
             "time-req", sqlite3_column_int(fetch_task_stmt, 3),
             "location", sqlite3_column_text(fetch_task_stmt, 4),
-            "schedule", sqlite3_column_int64(fetch_task_stmt, 5),
+            "schedule", MAKE_DATETIME(sqlite3_column_int64(fetch_task_stmt, 5)),
             "is-complete", sqlite3_column_int(fetch_task_stmt, 6),
             "description", sqlite3_column_text(fetch_task_stmt, 7),
-            "plan-start", sqlite3_column_int64(fetch_task_stmt, 8),
+            "plan-start", MAKE_DATETIME(sqlite3_column_int64(fetch_task_stmt, 8)),
             "plan-span", sqlite3_column_int(fetch_task_stmt, 9),
             NULL
     );

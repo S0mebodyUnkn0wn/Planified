@@ -13,7 +13,6 @@
 //
 //static guint upcoming_signals[N_SIGNALS];
 
-#define is_same_day(X,Y) ((g_date_time_get_day_of_year(X) == g_date_time_get_day_of_year(Y)) && (g_date_time_get_year(X) == g_date_time_get_year(Y)))
 
 struct _PlanifiedUpcomingList {
     GtkBox parent;
@@ -96,14 +95,14 @@ bind_list_header(GtkListItemFactory *factory,
     g_assert(GTK_IS_LIST_HEADER(list_header));
 
     label = gtk_list_header_get_child(list_header);
-    GDateTime *sched = g_date_time_new_from_unix_local(planified_task_get_schedule(task));
+    GDateTime *sched = planified_task_get_schedule(task);
     GDateTime *now = g_date_time_new_now_local();
 
 
-    gint diff = g_date_time_get_week_of_year(sched) - g_date_time_get_week_of_year(now);
-    gint ddiff = g_date_time_get_day_of_year(sched) - g_date_time_get_day_of_year(now);
-    if (planified_task_get_schedule(task) > 0) {
-        if (is_same_day(sched,now))
+    if (planified_task_get_schedule(task) != NULL) {
+        gint diff = g_date_time_get_week_of_year(sched) - g_date_time_get_week_of_year(now);
+        gint ddiff = g_date_time_get_day_of_year(sched) - g_date_time_get_day_of_year(now);
+        if (IS_SAME_DAY(sched, now))
             gtk_label_set_label((GtkLabel *) label, "Today:");
         else if (ddiff < 0)
             gtk_label_set_label((GtkLabel *) label, "Overdue:");
@@ -120,8 +119,7 @@ bind_list_header(GtkListItemFactory *factory,
             }
         }
     } else
-        gtk_label_set_label((GtkLabel *) label, g_date_time_format(sched, "Unplanned:"));
-    g_date_time_unref(sched);
+        gtk_label_set_label((GtkLabel *) label, "Unplanned:");
     g_date_time_unref(now);
 }
 
@@ -148,12 +146,14 @@ filter_func(GObject *item,
     PlanifiedTask *task = PLANIFIED_TASK(item);
     if (planified_task_get_is_complete(task))
         return FALSE;
+    GDateTime *sched = planified_task_get_schedule(task);
+    gboolean is_planned = sched != NULL;
+    if (!is_planned)
+        return FALSE;
     GDateTime *now = g_date_time_new_now_local();
-    GDateTime *sched = g_date_time_new_from_unix_local(planified_task_get_schedule(task));
     int week_diff = g_date_time_get_week_of_year(sched) - g_date_time_get_week_of_year(now);
     g_date_time_unref(now);
-    g_date_time_unref(sched);
-    return (planified_task_get_schedule(task)>0 && week_diff <= 1);
+    return (week_diff <= 1);
 }
 
 static gint
@@ -164,24 +164,30 @@ compare_week_func(gconstpointer a,
         return 0;
     PlanifiedTask *task_a = PLANIFIED_TASK(a);
     PlanifiedTask *task_b = PLANIFIED_TASK(b);
-    GDateTime *a_sched = g_date_time_new_from_unix_local(planified_task_get_schedule(task_a));
-    GDateTime *b_sched = g_date_time_new_from_unix_local(planified_task_get_schedule(task_b));
+    GDateTime *a_sched = planified_task_get_schedule(task_a);
+    GDateTime *b_sched = planified_task_get_schedule(task_b);
     GDateTime *now = g_date_time_new_now_local();
+
+
     gint y_diff = g_date_time_get_year(a_sched) - g_date_time_get_year(b_sched);
     gint w_diff = g_date_time_get_week_of_year(a_sched) - g_date_time_get_week_of_year(b_sched);
 
-    g_date_time_unref(a_sched);
-    g_date_time_unref(b_sched);
-    if (y_diff != 0)
-        return y_diff;
+    gint res;
+    // If both are overdue, bunch them together
+    if ((g_date_time_difference(planified_task_get_schedule(task_a), now) < 0) &&
+        (g_date_time_difference(planified_task_get_schedule(task_b), now) < 0) &&
+        !IS_SAME_DAY(a_sched, now) && !IS_SAME_DAY(b_sched, now))
+        res = 0;
+    else if (y_diff != 0)
+        res = y_diff;
+    else if (IS_SAME_DAY(a_sched, now) != IS_SAME_DAY(b_sched, now))
+        res = IS_SAME_DAY(a_sched, now) ? -1 : 1;
+    else
+        res = w_diff;
 
-    if (w_diff != 0)
-        return w_diff;
+    g_date_time_unref(now);
+    return res;
 
-    if (is_same_day(a_sched,now)!=is_same_day(b_sched,now))
-        return is_same_day(a_sched,now)? -1 : 1;
-
-    return w_diff;
 }
 
 
@@ -193,9 +199,9 @@ compare_day_func(gconstpointer a,
         return 0;
     PlanifiedTask *task_a = PLANIFIED_TASK(a);
     PlanifiedTask *task_b = PLANIFIED_TASK(b);
-    gint64 a_sched = (planified_task_get_schedule(task_a));
-    gint64 b_sched = (planified_task_get_schedule(task_b));
-    gint diff =  (gint) (a_sched - b_sched)%INT_MAX;
+    GDateTime *b_sched = (planified_task_get_schedule(task_b));
+    GDateTime *a_sched = (planified_task_get_schedule(task_a));
+    gint diff = (gint) g_date_time_difference(a_sched, b_sched) % INT_MAX;
     return diff;
 }
 
@@ -252,11 +258,11 @@ planified_upcoming_list_init(PlanifiedUpcomingList *self) {
     gtk_scrolled_window_set_child((GtkScrolledWindow *) sw, self->upcoming_list);
     gtk_scrolled_window_set_propagate_natural_height((GtkScrolledWindow *) sw, TRUE);
 
-    gtk_widget_add_css_class(sw,"hide_overshoot");
+    gtk_widget_add_css_class(sw, "hide_overshoot");
     gtk_scrolled_window_set_policy((GtkScrolledWindow *) sw, GTK_POLICY_EXTERNAL, GTK_POLICY_EXTERNAL);
     gtk_scrolled_window_set_kinetic_scrolling((GtkScrolledWindow *) sw, TRUE);
     gtk_box_append((GtkBox *) self, sw);
-    self->scrolled_win=sw;
+    self->scrolled_win = sw;
 }
 
 static void

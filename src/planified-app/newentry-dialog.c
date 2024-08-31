@@ -99,13 +99,13 @@ newtask_confirmed(NewTaskDiag *self) {
     if (gtk_entry_buffer_get_length(task_deadline_buf) > 0) {
 
     }
-    gint64 deadline = 0;
+    GDateTime *deadline = NULL;
     if (common_date_chooser_is_date_chosen(COMMON_DATE_CHOOSER(self->task_deadline))) {
         GDateTime *chosen_date = common_date_chooser_get_chosen_date(COMMON_DATE_CHOOSER(self->task_deadline));
         if (chosen_date == NULL)
             is_valid = false;
         else
-            deadline = g_date_time_to_unix(chosen_date);
+            deadline = chosen_date;
     }
 
     int task_timereq_val = 0;
@@ -130,7 +130,7 @@ newtask_confirmed(NewTaskDiag *self) {
     GtkApplication *_app = gtk_window_get_application(GTK_WINDOW(self));
     PlanifiedApp *app = PLANIFIED_APP(_app);
     gint64 rowid = self->edit_mode ? planified_task_get_rowid(self->prefill_task) : -1;
-    gint64 schedule = self->edit_mode ? planified_task_get_schedule(self->prefill_task) : -1;
+    GDateTime *schedule = self->edit_mode ? planified_task_get_schedule(self->prefill_task) : NULL;
     gint64 is_complete = self->edit_mode ? planified_task_get_is_complete(self->prefill_task) : 0;
     gchar *location = self->edit_mode ? planified_task_get_location(self->prefill_task) : "";
 
@@ -143,7 +143,7 @@ newtask_confirmed(NewTaskDiag *self) {
                                              is_complete,
                                              rowid,
                                              description,
-                                             -1,-1);
+                                             NULL, -1);
 
     sqlite3 *handle = planified_app_get_db_handle(app);
     g_assert(handle != NULL);
@@ -257,20 +257,25 @@ NewTaskDiag *newtask_diag_editmode_new(PlanifiedAppWindow *win, GtkApplication *
     g_assert(PLANIFIED_IS_TASK(self->prefill_task));
     gtk_entry_buffer_set_text(gtk_entry_get_buffer(GTK_ENTRY(self->task_name)),
                               planified_task_get_task_text(self->prefill_task), -1);
+
+    // Prefill the description
     if (planified_task_get_description(self->prefill_task) != NULL) {
         GtkTextBuffer *buf = gtk_text_view_get_buffer((GtkTextView *) self->task_description);
         gtk_text_buffer_set_text(buf, planified_task_get_description(self->prefill_task), -1);
     }
-    if (planified_task_get_deadline(self->prefill_task) > 0) {
-        GDateTime *deadline = g_date_time_new_from_unix_local(planified_task_get_deadline(self->prefill_task));
+
+    // Prefill the deadline
+    if (planified_task_get_deadline(self->prefill_task) != NULL) {
         gtk_entry_buffer_set_text(gtk_entry_get_buffer(GTK_ENTRY(self->task_deadline)),
-                                  g_date_time_format(deadline, "%d/%m/%Y"), -1);
-        g_date_time_unref(deadline);
+                                  g_date_time_format(planified_task_get_deadline(self->prefill_task), "%d/%m/%Y"), -1);
     }
+
+    // Prefill the time requirement
     if (planified_task_get_timereq(self->prefill_task) > 0) {
         char *timereq_str = g_strdup_printf("%d", planified_task_get_timereq(self->prefill_task));
         gtk_entry_buffer_set_text(gtk_entry_get_buffer(GTK_ENTRY(self->task_timereq)), timereq_str, -1);
     };
+
     GListModel *tags = (GListModel *) planified_task_get_tags(self->prefill_task);
     for (guint i = 0; i < g_list_model_get_n_items(tags); i++) {
         PlanifiedTag *tag = g_list_model_get_item(tags, i);

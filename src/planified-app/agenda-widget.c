@@ -54,7 +54,7 @@ planified_agenda_widget_refresh_data(PlanifiedAgendaWidget *self){
                        -1,
                        &get_tasks_stmt,
                        NULL);
-    sqlite3_bind_int64(get_tasks_stmt, 1, g_date_time_to_unix(self->open_on));
+    sqlite3_bind_int64(get_tasks_stmt, 1, DATETIME_TO_UNIX_S(self->open_on));
     int status;
     while ((status = sqlite3_step(get_tasks_stmt)) == SQLITE_ROW) {
         PlanifiedTask *task = planified_task_new_from_sqlite(get_tasks_stmt);

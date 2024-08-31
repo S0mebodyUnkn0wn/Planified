@@ -75,6 +75,7 @@ G_DECLARE_FINAL_TYPE(PlanifiedPlanningView, planified_planning_view, PLANIFIED, 
 #define PLANIFIED_TASK_LIST_TYPE (planified_task_list_get_type())
 
 G_DECLARE_FINAL_TYPE(PlanifiedTaskList, planified_task_list, PLANIFIED, TASK_LIST, GtkBox)
+
 // METHOD DECLARATIONS
 
 // PlanifiedTaskWidget methods:

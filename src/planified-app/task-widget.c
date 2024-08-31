@@ -71,36 +71,36 @@ refresh_data(GObject *_task, GParamSpec *pspec, gpointer _self) {
 //    g_assert(PLANIFIED_IS_TASK_WIDGET(_self));
     PlanifiedTaskWidget *self = PLANIFIED_TASK_WIDGET(_self);
 
-    if (!PLANIFIED_IS_TASK(planified_task_container_get_task((PlanifiedTaskContainer *) self))) {
+    PlanifiedTask *task_obj = planified_task_container_get_task((PlanifiedTaskContainer *) self);
+    if (!PLANIFIED_IS_TASK(task_obj)) {
         return;
     }
 
-    gtk_label_set_label(self->task_label, planified_task_get_task_text(
-            planified_task_container_get_task((PlanifiedTaskContainer *) self)));
-    if (planified_task_get_deadline(planified_task_container_get_task((PlanifiedTaskContainer *) self)) != 0) {
-        GDateTime *deadline = g_date_time_new_from_unix_local(
-                planified_task_get_deadline(planified_task_container_get_task((PlanifiedTaskContainer *) self)));
+    char *task_text = planified_task_get_task_text(planified_task_container_get_task(PLANIFIED_TASK_CONTAINER(self)));
+
+    gtk_label_set_label(self->task_label, task_text);
+
+    if (planified_task_get_deadline(task_obj) != NULL) {
         gtk_widget_set_visible((GtkWidget *) self->deadline_label, TRUE);
-        gtk_label_set_label(self->deadline_label, g_date_time_format(deadline, "deadline: %d/%m/%Y"));
-        g_date_time_unref(deadline);
+        gtk_label_set_label(self->deadline_label, g_date_time_format(planified_task_get_deadline(
+                task_obj), "deadline: %d/%m/%Y"));
+
     } else {
         gtk_label_set_label(self->deadline_label, "");
         gtk_widget_set_visible((GtkWidget *) self->deadline_label, FALSE);
     }
-    GListStore *tags = planified_task_get_tags(planified_task_container_get_task((PlanifiedTaskContainer *) self));
-    if (tags != NULL && (g_list_model_get_n_items((GListModel *) tags) > 0)){
-//        g_print("Test\n");
+
+    GListStore *tags = planified_task_get_tags(task_obj);
+    if (tags != NULL && (g_list_model_get_n_items((GListModel *) tags) > 0)) {
         gtk_widget_set_visible((GtkWidget *) self->tag_grid, TRUE);
         gtk_grid_view_set_model(self->tag_grid, (GtkSelectionModel *) gtk_no_selection_new((GListModel *) tags));
-        g_print("Got %d tags\n",g_list_model_get_n_items((GListModel *) gtk_grid_view_get_model(self->tag_grid)));
     } else {
-//        g_print("no tags\n");
         gtk_widget_set_visible((GtkWidget *) self->tag_grid, FALSE);
     }
-    gtk_check_button_set_active(self->complete_button, planified_task_get_is_complete(
-            planified_task_container_get_task((PlanifiedTaskContainer *) self)));
-    g_print("Done refreshing task %s (called for: %s)\n", planified_task_get_task_text(planified_task_container_get_task(
-            (PlanifiedTaskContainer *) self)),pspec!=NULL ? pspec->name : "NULL");
+    gtk_check_button_set_active(self->complete_button, planified_task_get_is_complete(task_obj));
+
+
+    g_print("Done refreshing task_obj %s (called for: %s)\n", task_text, pspec != NULL ? pspec->name : "NULL");
 }
 
 static void

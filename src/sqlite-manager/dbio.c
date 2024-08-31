@@ -85,10 +85,10 @@ static void bind_stmt_from_task(sqlite3_stmt *statement, PlanifiedTask *task) {
     gchar *description = planified_task_get_description(task);
 
     g_print("%d", sqlite3_bind_text(statement, 1, task_text, -1, SQLITE_TRANSIENT));
-    g_print("%d", sqlite3_bind_int64(statement, 2, planified_task_get_deadline(task)));
+    g_print("%d", sqlite3_bind_int64(statement, 2, DATETIME_TO_UNIX_S(planified_task_get_deadline(task))));
     g_print("%d", sqlite3_bind_int(statement, 3, planified_task_get_timereq(task)));
     g_print("%d", sqlite3_bind_text(statement, 4, location, -1, SQLITE_TRANSIENT));
-    g_print("%d", sqlite3_bind_int64(statement, 5, planified_task_get_schedule(task)));
+    g_print("%d", sqlite3_bind_int64(statement, 5, DATETIME_TO_UNIX_S(planified_task_get_schedule(task))));
     g_print("%d", sqlite3_bind_int(statement, 6, (int) planified_task_get_is_complete(task)));
     g_print("%d", sqlite3_bind_text(statement, 7, description, -1, SQLITE_TRANSIENT));
 

@@ -85,8 +85,7 @@ on_drop(GtkDropTarget *target,
             GTimeZone *tz = g_time_zone_new_local();
             GDateTime *selected_date_time = g_date_time_new_from_iso8601(iso_datetime->str, tz);
             g_assert(selected_date_time != NULL);
-            planified_task_set_schedule(task, g_date_time_to_unix(selected_date_time));
-            g_date_time_unref(selected_date_time);
+            planified_task_set_schedule(task, selected_date_time);
             g_time_zone_unref(tz);
             g_string_free(iso_datetime, TRUE);
             g_print("Updating task...\n");
@@ -114,10 +113,11 @@ planified_itinerary_widget_refresh_data(GObject *_app, int operation, PlanifiedT
     }
     for (guint i = 0; i < g_list_model_get_n_items((GListModel *) tasks); i++) {
         PlanifiedTask *task = g_list_model_get_item((GListModel *) tasks, i);
-        GDateTime *start_time = g_date_time_new_from_unix_local(planified_task_get_schedule(task));
+        GDateTime *start_time = planified_task_get_schedule(task);
         PlanifiedItineraryWidgetEntry *entry;
         entry = find_entry_by_task(self, task);
-        if (strcmp(g_date_time_format(start_time, "%Y-%m-%d"), g_date_time_format(self->open_on, "%Y-%m-%d")) != 0) {
+        if (start_time == NULL ||
+            strcmp(g_date_time_format(start_time, "%Y-%m-%d"), g_date_time_format(self->open_on, "%Y-%m-%d")) != 0) {
             if (entry != NULL)
                 gtk_grid_remove(GTK_GRID(self), GTK_WIDGET(entry));
         } else {
