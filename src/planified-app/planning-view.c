@@ -12,6 +12,8 @@ struct _PlanifiedPlanningView {
     GtkWidget *planning_day_plans;
     GtkWidget *planning_calendar;
 
+    GtkWidget *selected_day_list;
+    GtkWidget *selected_day_timetable;
 
     GtkLabel *details_task_title;
     GtkLabel *details_task_description;
@@ -31,10 +33,10 @@ on_date_selected(GtkCalendar *calendar,
                  gpointer _self) {
     GDateTime *date = gtk_calendar_get_date(calendar);
     PlanifiedPlanningView *self = PLANIFIED_PLANNING_VIEW(_self);
-    gchar* date_string = g_date_time_format(date,"Your plans for %A, %B %-e");
-    gchar* quantifier;
+    gchar *date_string = g_date_time_format(date, "Your plans for %A, %B %-e");
+    gchar *quantifier;
     int dm = g_date_time_get_day_of_month(date);
-    switch ((dm%10)*(dm<10 || dm>=14)) {
+    switch ((dm % 10) * (dm < 10 || dm >= 14)) {
         case 1:
             quantifier = "st:";
             break;
@@ -47,7 +49,10 @@ on_date_selected(GtkCalendar *calendar,
         default:
             quantifier = "th:";
     }
-    gtk_label_set_label(self->selected_day_date_label, strcat(date_string,quantifier));
+    gtk_label_set_label(self->selected_day_date_label, strcat(date_string, quantifier));
+    planified_itinerary_widget_set_selected_date((PlanifiedItineraryWidget *) self->selected_day_timetable,
+                                                 gtk_calendar_get_date((GtkCalendar *) self->planning_calendar));
+
 
     g_free(date_string);
     g_date_time_unref(date);
@@ -58,7 +63,6 @@ planified_planning_view_init(PlanifiedPlanningView *self) {
     gtk_widget_init_template(GTK_WIDGET(self));
     g_signal_connect(self->planning_calendar,"day-selected",G_CALLBACK(on_date_selected),self);
 
-    on_date_selected((GtkCalendar *) self->planning_calendar, self);
 }
 
 
@@ -73,6 +77,7 @@ planified_planning_view_class_init(PlanifiedPlanningViewClass *class) {
     gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), PlanifiedPlanningView, planning_day_plans);
     gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), PlanifiedPlanningView, planning_calendar);
     gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), PlanifiedPlanningView, selected_day_date_label);
+    gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), PlanifiedPlanningView, selected_day_timetable);
 
 }
 
@@ -95,9 +100,12 @@ update_details(GtkSelectionModel *model,
 
 void planified_planning_view_setup(PlanifiedPlanningView *self) {
     planified_task_list_setup((PlanifiedTaskList *) self->planning_task_list);
+    planified_itinerary_widget_setup(PLANIFIED_ITINERARY_WIDGET(self->selected_day_timetable));
 
     GListModel *model = (GListModel *) planified_task_list_get_model((PlanifiedTaskList *) self->planning_task_list);
     g_signal_connect(model, "selection-changed", G_CALLBACK(update_details), self);
+    update_details(NULL, 0, 0, self);
+    on_date_selected((GtkCalendar *) self->planning_calendar, self);
 
 }
 

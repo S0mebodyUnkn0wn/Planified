@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
     <template class="PlanifiedPlanningView" parent="GtkBox">
-
         <child>
             <object class="GtkPaned" id="planning_calendar_tasks_split">
                 <property name="halign">GTK_ALIGN_FILL</property>
@@ -27,27 +26,80 @@
                         </child>
                         <child>
                             <object class="GtkBox" id="planning_day_plans">
-                                <property name="margin-start">10</property>
-                                <property name="margin-end">10</property>
-                                <property name="margin-top">10</property>
-                                <property name="margin-bottom">10</property>
                                 <property name="orientation">vertical</property>
                                 <property name="vexpand">TRUE</property>
                                 <child>
-                                    <object class="GtkLabel" id="selected_day_date_label">
-                                        <property name="label">Select a day to see what you have planned for it!</property>
-                                        <property name="hexpand">FALSE</property>
-                                        <property name="xalign">0</property>
-                                        <property name="valign">0</property>
+                                    <object class="GtkBox">
+                                        <property name="margin-start">10</property>
+                                        <property name="margin-end">10</property>
 
-                                        <style>
-                                            <class name="subtitle_text"/>
-                                        </style>
+                                        <property name="spacing">10</property>
+                                        <child>
+                                            <object class="GtkLabel" id="selected_day_date_label">
+                                                <property name="margin-top">10</property>
+                                                <property name="margin-bottom">10</property>
+                                                <property name="label">Select a day to see what you have planned for it!
+                                                </property>
+                                                <property name="wrap">TRUE</property>
+                                                <property name="hexpand">TRUE</property>
+                                                <property name="xalign">0</property>
+                                                <property name="valign">0</property>
+
+                                                <style>
+                                                    <class name="subtitle_text"/>
+                                                </style>
+                                            </object>
+                                        </child>
+                                        <child>
+                                            <object class="GtkStackSwitcher">
+                                                <property name="hexpand">TRUE</property>
+                                                <property name="vexpand">FALSE</property>
+
+                                                <property name="halign">end</property>
+                                                <property name="valign">center</property>
+                                                <property name="stack">selected_day_stack</property>
+                                            </object>
+                                        </child>
+                                    </object>
+                                </child>
+
+                                <child>
+                                    <object class="GtkScrolledWindow">
+                                        <child>
+                                            <object class="GtkStack" id="selected_day_stack">
+                                                <property name="transition-type">GTK_STACK_TRANSITION_TYPE_SLIDE_LEFT_RIGHT</property>
+                                                <child>
+                                                    <object class="GtkStackPage">
+                                                        <property name="name">list</property>
+                                                        <property name="icon-name">view-list</property>
+                                                        <property name="title">Show All Planned</property>
+                                                        <property name="child">
+                                                            <object class="GtkListView" id="selected_day_list">
+                                                            </object>
+                                                        </property>
+                                                    </object>
+                                                </child>
+                                                <child>
+                                                    <object class="GtkStackPage">
+                                                        <property name="name">timetable</property>
+                                                        <property name="icon-name">view-time-schedule</property>
+                                                        <property name="title">Show Only Scheduled</property>
+                                                        <property name="child">
+                                                            <object class="PlanifiedItineraryWidget"
+                                                                    id="selected_day_timetable">
+                                                                <property name="vexpand">TRUE</property>
+                                                                <property name="hexpand">TRUE</property>
+                                                            </object>
+                                                        </property>
+                                                    </object>
+                                                </child>
+                                            </object>
+                                        </child>
+
                                     </object>
                                 </child>
                             </object>
                         </child>
-
                     </object>
                 </child>
                 <child>
@@ -59,45 +111,43 @@
                         <property name="shrink-end-child">FALSE</property>
                         <property name="shrink-start-child">FALSE</property>
                         <child>
-                            <object class="GtkBox">
-                                <child>
-                                    <object class="PlanifiedTaskList" id="planning_task_list">
-                                    </object>
-                                </child>
+                            <object class="PlanifiedTaskList" id="planning_task_list">
                             </object>
                         </child>
                         <child>
-                            <object class="GtkBox">
-                                <property name="margin-start">10</property>
-                                <property name="margin-end">10</property>
-                                <property name="margin-top">10</property>
-                                <property name="margin-bottom">10</property>
-                                <property name="vexpand">TRUE</property>
-                                <property name="orientation">vertical</property>
+                            <object class="GtkScrolledWindow">
                                 <child>
-                                    <object class="GtkLabel" id="details_task_title">
-                                        <property name="wrap">TRUE</property>
-                                        <property name="xalign">0</property>
-                                        <style>
-                                            <class name="subtitle_text"/>
-                                        </style>
-                                    </object>
-                                </child>
-                                <child>
-                                    <object class="GtkLabel" id="details_task_description">
-                                        <property name="wrap">TRUE</property>
-                                        <property name="xalign">0</property>
+                                    <object class="GtkBox">
+                                        <property name="margin-start">10</property>
+                                        <property name="margin-end">10</property>
+                                        <property name="margin-top">10</property>
+                                        <property name="margin-bottom">10</property>
+                                        <property name="vexpand">TRUE</property>
+                                        <property name="orientation">vertical</property>
+                                        <child>
+                                            <object class="GtkLabel" id="details_task_title">
+                                                <property name="wrap">TRUE</property>
+                                                <property name="xalign">0</property>
+                                                <style>
+                                                    <class name="subtitle_text"/>
+                                                </style>
+                                            </object>
+                                        </child>
+                                        <child>
+                                            <object class="GtkLabel" id="details_task_description">
+                                                <property name="wrap">TRUE</property>
+                                                <property name="xalign">0</property>
 
-                                        <style>
-                                            <class name="details_text"/>
-                                        </style>
+                                                <style>
+                                                    <class name="details_text"/>
+                                                </style>
+                                            </object>
+                                        </child>
                                     </object>
                                 </child>
                             </object>
-
                         </child>
                     </object>
-
                 </child>
             </object>
         </child>
