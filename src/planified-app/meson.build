@@ -16,6 +16,7 @@ app_source = [
     'preferences-dialog.c',
     'planning-view.c',
     'task-list.c',
+    'plan-dialog.c',
     planified_resources,
 ]
 

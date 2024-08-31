@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <template class="PlanifiedPlanDialog" parent="GtkApplicationWindow">
+        <!--        <property name="width-request">600</property>-->
+        <!--        <property name="height-request">350</property>-->
+        <property name="title" translatable="yes">Plan a task</property>
+        <property name="resizable">1</property>
+        <property name="modal">1</property>
+        <child type="titlebar">
+            <object class="GtkHeaderBar" id="header">
+            </object>
+        </child>
+        <child>
+            <object class="GtkBox" id="content_area">
+                <property name="margin-start">12</property>
+                <property name="margin-end">12</property>
+                <property name="margin-top">12</property>
+                <property name="margin-bottom">12</property>
+                <property name="spacing">12</property>
+                <property name="orientation">vertical</property>
+                <property name="hexpand">TRUE</property>
+                <property name="vexpand">TRUE</property>
+                <property name="halign">GTK_ALIGN_FILL</property>
+
+                <child>
+                    <object class="GtkGrid">
+                        <property name="vexpand">TRUE</property>
+                        <property name="hexpand">TRUE</property>
+                        <property name="row-spacing">12</property>
+                        <property name="column-spacing">12</property>
+                        <child>
+                            <object class="GtkLabel">
+                                <property name="label">Start on:</property>
+                                <property name="wrap">TRUE</property>
+                                <layout>
+                                    <property name="row">0</property>
+                                    <property name="column">0</property>
+                                </layout>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="CommonDateChooser">
+                                <property name="hexpand">TRUE</property>
+                                <property name="halign">GTK_ALIGN_END</property>
+
+
+                                <layout>
+                                    <property name="row">0</property>
+                                    <property name="column">1</property>
+                                </layout>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkLabel">
+                                <property name="label">Finish by:</property>
+                                <property name="wrap">TRUE</property>
+
+                                <layout>
+                                    <property name="row">1</property>
+                                    <property name="column">0</property>
+                                </layout>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="CommonDateChooser">
+                                <property name="hexpand">TRUE</property>
+                                <property name="halign">GTK_ALIGN_END</property>
+
+                                <layout>
+                                    <property name="row">1</property>
+                                    <property name="column">1</property>
+                                </layout>
+                            </object>
+                        </child>
+                    </object>
+                </child>
+                <child>
+                    <object class="GtkButton">
+                        <property name="vexpand">TRUE</property>
+                        <property name="height-request">40</property>
+                        <property name="label">Confirm</property>
+                        <property name="valign">GTK_ALIGN_END</property>
+                        <property name="halign">GTK_ALIGN_END</property>
+                    </object>
+                </child>
+            </object>
+        </child>
+    </template>
+</interface>

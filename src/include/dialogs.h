@@ -27,4 +27,15 @@ void
 newtask_activated(GSimpleAction *action,
                   GVariant *parameter,
                   gpointer app);
+
+
+// PlanifiedPlanDialog Methods:
+
+PlanifiedPlanDialog *
+planified_plan_dialog_new(PlanifiedAppWindow *win, GtkApplication *app);
+
+void
+planified_plan_dialog_activated(GSimpleAction *action,
+                                GVariant *parameter,
+                                gpointer task_widget);
 #endif //PLANIFIED_DIALOGS_H

@@ -135,9 +135,10 @@ edit_activated(GSimpleAction *action,
 
 static GActionEntry task_action_entries[] =
         {
-                {"delete",     delete_activated, NULL, NULL, NULL},
-                {"unschedule", unschedule_task,  NULL, NULL, NULL},
-                {"edit",       edit_activated,   NULL, NULL, NULL},
+                {"delete",     delete_activated,                NULL, NULL, NULL},
+                {"plan",       planified_plan_dialog_activated, NULL, NULL, NULL},
+                {"unschedule", unschedule_task,                 NULL, NULL, NULL},
+                {"edit",       edit_activated,                  NULL, NULL, NULL},
         };
 
 
@@ -154,8 +155,8 @@ planified_task_container_init(PlanifiedTaskContainer *self) {
     gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(right_click), GDK_BUTTON_SECONDARY);
     GtkBuilder *builder = gtk_builder_new_from_resource("/planified/context-menus.ui");
     GMenu *menu = g_menu_new();
-    g_menu_append_section(menu,NULL,G_MENU_MODEL(gtk_builder_get_object(builder, "task-context-menu")));
-    g_menu_append_section(menu,NULL,G_MENU_MODEL(gtk_builder_get_object(builder, "win-context-menu")));
+    g_menu_append_section(menu, NULL, G_MENU_MODEL(gtk_builder_get_object(builder, "task-context-menu")));
+    g_menu_append_section(menu, NULL, G_MENU_MODEL(gtk_builder_get_object(builder, "win-context-menu")));
     gtk_popover_menu_set_menu_model((GtkPopoverMenu *) priv->context_menu,
                                     G_MENU_MODEL(menu));
     g_object_unref(builder);
