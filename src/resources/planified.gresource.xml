@@ -4,7 +4,7 @@
         <file preprocess="xml-stripblanks">app-window.ui</file>
         <file preprocess="xml-stripblanks">timetable-view.ui</file>
         <file preprocess="xml-stripblanks">home-view.ui</file>
-        <file preprocess="xml-stripblanks">newtask-dialog.ui</file>
+        <file preprocess="xml-stripblanks">newentry-dialog.ui</file>
         <file preprocess="xml-stripblanks">task-widget.ui</file>
         <file preprocess="xml-stripblanks">itinerary-widget-entry.ui</file>
         <file preprocess="xml-stripblanks">weather-widget.ui</file>
