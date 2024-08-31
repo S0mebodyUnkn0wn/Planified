@@ -124,7 +124,10 @@ GDateTime *
 planified_itinerary_widget_get_selected_date(PlanifiedItineraryWidget *self);
 
 void
-planified_itinerary_widget_shift_open_day(PlanifiedItineraryWidget *self, int shift_by);
+planified_itinerary_widget_set_selected_date(PlanifiedItineraryWidget *self, GDateTime *date);
+
+void
+planified_itinerary_widget_shift_selected_date(PlanifiedItineraryWidget *self, int shift_by);
 
 void
 planified_itinerary_widget_go_to_next_day(PlanifiedItineraryWidget *self);

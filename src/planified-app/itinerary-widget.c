@@ -17,6 +17,7 @@ static guint itinerary_signals[N_SIGNALS];
 struct _PlanifiedItineraryWidget {
     GtkGrid parent;
 
+    int width;
     GDateTime *open_on;
 };
 
@@ -26,29 +27,40 @@ G_DEFINE_TYPE(PlanifiedItineraryWidget, planified_itinerary_widget, GTK_TYPE_GRI
 //TODO: Fix segfault
 static void
 insert(PlanifiedItineraryWidget *self, GtkWidget *item, int col, int row, int width, int height) {
+    int insert_col = col;
     for (int i = row; i < row + height; i++) {
-        GtkWidget *current_occupant = gtk_grid_get_child_at(GTK_GRID(self), col, i);
-        if (PLANIFIED_IS_ITINERARY_WIDGET_ENTRY(current_occupant)) {
-            PlanifiedTask *occupant_task = planified_itinerary_widget_entry_get_task(
-                    PLANIFIED_ITINERARY_WIDGET_ENTRY(current_occupant));
-            gtk_grid_remove(GTK_GRID(self), current_occupant);
-            if (occupant_task != planified_itinerary_widget_entry_get_task(PLANIFIED_ITINERARY_WIDGET_ENTRY(item))) {
+        GtkWidget *current_occupant = gtk_grid_get_child_at(GTK_GRID(self), insert_col, i);
+        while (PLANIFIED_IS_ITINERARY_WIDGET_ENTRY(current_occupant)) {
+            insert_col++;
+            if (insert_col + 1 > self->width) {
+                self->width = insert_col + 1;
+            }
+            current_occupant = gtk_grid_get_child_at(GTK_GRID(self), insert_col, i);
+        }
+//        if (PLANIFIED_IS_ITINERARY_WIDGET_ENTRY(current_occupant)) {
+
+//            PlanifiedTask *occupant_task = planified_itinerary_widget_entry_get_task(
+//                    PLANIFIED_ITINERARY_WIDGET_ENTRY(current_occupant));
+//            gtk_grid_remove(GTK_GRID(self), current_occupant);
+//            if (occupant_task != planified_itinerary_widget_entry_get_task(PLANIFIED_ITINERARY_WIDGET_ENTRY(item))) {
 //                planified_task_set_schedule(occupant_task, -1);
 //                database_update_task(get_handle(GTK_WIDGET(self)), occupant_task);
-            }
-        }
+//            }
+//        }
     }
-    gtk_grid_attach(GTK_GRID(self), item, col, row, width, height);
+    gtk_grid_attach(GTK_GRID(self), item, insert_col, row, width, height);
 }
 
 PlanifiedItineraryWidgetEntry *
 find_entry_by_task(PlanifiedItineraryWidget *self, PlanifiedTask *task) {
     int i = 0;
     while (gtk_grid_get_child_at(GTK_GRID(self), 0, i) != NULL) {
-        GtkWidget *item = gtk_grid_get_child_at(GTK_GRID(self), 1, i);
-        if (PLANIFIED_IS_ITINERARY_WIDGET_ENTRY(item)) {
-            if (planified_itinerary_widget_entry_get_task(PLANIFIED_ITINERARY_WIDGET_ENTRY(item)) == task) {
-                return PLANIFIED_ITINERARY_WIDGET_ENTRY(item);
+        for (int j = 1; j < self->width; j++) {
+            GtkWidget *item = gtk_grid_get_child_at(GTK_GRID(self), j, i);
+            if (PLANIFIED_IS_ITINERARY_WIDGET_ENTRY(item)) {
+                if (planified_itinerary_widget_entry_get_task(PLANIFIED_ITINERARY_WIDGET_ENTRY(item)) == task) {
+                    return PLANIFIED_ITINERARY_WIDGET_ENTRY(item);
+                }
             }
         }
         i++;
@@ -97,13 +109,21 @@ on_drop(GtkDropTarget *target,
     } else return FALSE;
 }
 
+void
+planified_itinerary_widget_reload_data(PlanifiedItineraryWidget *self);
 
 void
 planified_itinerary_widget_refresh_data(GObject *_app, int operation, PlanifiedTask *updated_task, gpointer *_self) {
-    if (operation == SQLITE_DELETE) return;
-    g_print("!\n");
-    PlanifiedApp *app = PLANIFIED_APP(_app);
     PlanifiedItineraryWidget *self = PLANIFIED_ITINERARY_WIDGET(_self);
+    for (int i = 1; i < self->width; i++) {
+        gtk_grid_remove_column(GTK_GRID(self), 1);
+    }
+    self->width = 2;
+    updated_task = nullptr;
+//    if (operation == SQLITE_DELETE) {
+//
+//    };
+    PlanifiedApp *app = PLANIFIED_APP(_app);
     GListStore *tasks;
     if (updated_task == NULL) {
         tasks = planified_app_get_tasks(app);
@@ -125,7 +145,7 @@ planified_itinerary_widget_refresh_data(GObject *_app, int operation, PlanifiedT
                       (g_date_time_get_minute(start_time) / ROW_RESOLUTION);
 
             if (entry == NULL)
-                entry = planified_itinerary_widget_entry_new(task, g_date_time_to_unix(start_time));
+                entry = planified_itinerary_widget_entry_new(task, DATETIME_TO_UNIX_S(start_time));
             else {
                 g_object_ref(entry);
                 gtk_grid_remove(GTK_GRID(self), GTK_WIDGET(entry));
@@ -135,7 +155,6 @@ planified_itinerary_widget_refresh_data(GObject *_app, int operation, PlanifiedT
                 height = 1;
             insert(self, GTK_WIDGET(entry), 1, row, 1, height);
         }
-        g_date_time_unref(start_time);
         g_object_unref(task);
     }
     if (updated_task != NULL) {
@@ -145,29 +164,33 @@ planified_itinerary_widget_refresh_data(GObject *_app, int operation, PlanifiedT
 
 }
 
+
+/*
+ * The instance assumes ownership of `date`
+ */
 void
-planified_itinerary_widget_reload_data(PlanifiedItineraryWidget *self) {
-    gtk_grid_remove_column(GTK_GRID(self), 1);
-    planified_itinerary_widget_refresh_data((GObject *) get_planified_app(GTK_WIDGET(self)), SQLITE_INSERT, NULL,
-                                            (gpointer) self);
+planified_itinerary_widget_set_selected_date(PlanifiedItineraryWidget *self, GDateTime *date) {
+    g_date_time_unref(self->open_on);
+    self->open_on = date;
+    g_signal_emit(self, itinerary_signals[OPEN_DATE_CHANGED], 0);
 }
 
 void
-planified_itinerary_widget_shift_open_day(PlanifiedItineraryWidget *self, int shift_by) {
+planified_itinerary_widget_shift_selected_date(PlanifiedItineraryWidget *self, int shift_by) {
     GDateTime *t = g_date_time_add_days(self->open_on, shift_by);
-    g_free(self->open_on);
+    g_date_time_unref(self->open_on);
     self->open_on = t;
     g_signal_emit(self, itinerary_signals[OPEN_DATE_CHANGED], 0);
 }
 
 void
 planified_itinerary_widget_go_to_next_day(PlanifiedItineraryWidget *self) {
-    planified_itinerary_widget_shift_open_day(self, 1);
+    planified_itinerary_widget_shift_selected_date(self, 1);
 }
 
 void
 planified_itinerary_widget_go_to_prev_day(PlanifiedItineraryWidget *self) {
-    planified_itinerary_widget_shift_open_day(self, -1);
+    planified_itinerary_widget_shift_selected_date(self, -1);
 }
 
 GDateTime *
@@ -191,6 +214,7 @@ on_swipe(GtkGestureSwipe *swipe,
 
 static void
 planified_itinerary_widget_init(PlanifiedItineraryWidget *widget) {
+    widget->width = 2;
     GDateTime *local_time = g_date_time_new_now_local();
     widget->open_on = g_date_time_new_local(g_date_time_get_year(local_time),
                                             g_date_time_get_month(local_time),
@@ -222,7 +246,7 @@ planified_itinerary_widget_init(PlanifiedItineraryWidget *widget) {
     GtkDropTarget *drop_target = gtk_drop_target_new(PLANIFIED_TASK_TYPE, GDK_ACTION_MOVE);
     GtkGesture *swipe = gtk_gesture_swipe_new();
 
-    g_signal_connect(swipe, "swipe", G_CALLBACK(on_swipe), widget);
+//    g_signal_connect(swipe, "swipe", G_CALLBACK(on_swipe), widget);
     g_signal_connect(drop_target, "drop", G_CALLBACK(on_drop), widget);
     g_signal_connect_swapped(widget, "open-date-changed", G_CALLBACK(planified_itinerary_widget_reload_data), widget);
 
@@ -248,6 +272,15 @@ planified_itinerary_widget_class_init(PlanifiedItineraryWidgetClass *class) {
                           0     /* n_params */,
                           NULL  /* param_types */);
 
+}
+
+void planified_itinerary_widget_reload_data(PlanifiedItineraryWidget *self) {
+    for (int i = 1; i < self->width; i++) {
+        gtk_grid_remove_column(GTK_GRID(self), 1);
+    }
+    self->width = 2;
+    planified_itinerary_widget_refresh_data((GObject *) get_planified_app(GTK_WIDGET(self)), SQLITE_INSERT, NULL,
+                                            (gpointer) self);
 }
 
 void
