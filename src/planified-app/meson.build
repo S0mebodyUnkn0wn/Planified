@@ -2,7 +2,7 @@ app_source = [
     'app.c',
     'timetable-view.c',
     'app-window.c',
-    'newtask-dialog.c',
+    'newentry-dialog.c',
     'task-widget.c',
     'itinerary-widget.c',
     'home-view.c',

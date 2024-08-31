@@ -127,8 +127,8 @@ edit_activated(GSimpleAction *action,
 
     GtkApplication *app = gtk_window_get_application(GTK_WINDOW(gtk_widget_get_ancestor(self, GTK_TYPE_WINDOW)));
     GtkWindow *win = gtk_application_get_active_window(app);
-    NewTaskDiag *dialog = newtask_diag_editmode_new(PLANIFIED_APP_WINDOW(win), app,
-                                                    planified_task_container_get_task(self));
+    PlanifiedNewentryDialog *dialog = planified_newentry_dialog_editmode_new(PLANIFIED_APP_WINDOW(win), app,
+                                                                             planified_task_container_get_task(self));
     gtk_window_present(GTK_WINDOW(dialog));
 
 }

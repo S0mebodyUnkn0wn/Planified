@@ -6,17 +6,17 @@
 #include <stdlib.h>
 #include "common-widgets.h"
 #include "dialogs.h"
-// NewTaskDiag, a dialog window for creating new tasks
+// PlanifiedNewentryDialog, a dialog window for creating new tasks
 
 typedef enum {
     EDIT_MODE = 1,
     EDIT_TASK,
     N_PROPERTIES
-} NewTaskDiagProperty;
+} PlanifiedNewentryDialogProperty;
 
 static GParamSpec *obj_properties[N_PROPERTIES] = {NULL,};
 
-struct _NewTaskDiag {
+struct _PlanifiedNewentryDialog {
     GtkApplicationWindow parent;
 
     GtkWidget *task_name;
@@ -32,18 +32,18 @@ struct _NewTaskDiag {
     PlanifiedTask *prefill_task;
 };
 
-G_DEFINE_TYPE (NewTaskDiag, newtask_diag, GTK_TYPE_APPLICATION_WINDOW)
+G_DEFINE_TYPE (PlanifiedNewentryDialog, planified_newentry_dialog, GTK_TYPE_APPLICATION_WINDOW)
 
 static void
-newtask_diag_set_property(GObject
-                          *object,
-                          guint property_id,
-                          const GValue *value,
-                          GParamSpec
-                          *pspec) {
-    NewTaskDiag *self = NEWTASK_DIAG(object);
+planified_newentry_dialog_set_property(GObject
+                                       *object,
+                                       guint property_id,
+                                       const GValue *value,
+                                       GParamSpec
+                                       *pspec) {
+    PlanifiedNewentryDialog *self = PLANIFIED_NEWENTRY_DIALOG(object);
 
-    switch ((NewTaskDiagProperty) property_id) {
+    switch ((PlanifiedNewentryDialogProperty) property_id) {
         case EDIT_MODE:
             self->edit_mode = g_value_get_boolean(value);
             break;
@@ -58,14 +58,14 @@ newtask_diag_set_property(GObject
 }
 
 static void
-newtask_diag_get_property(GObject *object,
-                          guint property_id,
-                          GValue *value,
-                          GParamSpec *pspec) {
+planified_newentry_dialog_get_property(GObject *object,
+                                       guint property_id,
+                                       GValue *value,
+                                       GParamSpec *pspec) {
 
-    NewTaskDiag *self = NEWTASK_DIAG(object);
+    PlanifiedNewentryDialog *self = PLANIFIED_NEWENTRY_DIALOG(object);
 
-    switch ((NewTaskDiagProperty) property_id) {
+    switch ((PlanifiedNewentryDialogProperty) property_id) {
         case EDIT_MODE:
             g_value_set_boolean(value, self->edit_mode);
             break;
@@ -84,7 +84,7 @@ newtask_diag_get_property(GObject *object,
  * Completes task creation, using data entered by the user into provided entry buffers
  */
 static void
-newtask_confirmed(NewTaskDiag *self) {
+newtask_confirmed(PlanifiedNewentryDialog *self) {
     bool is_valid = true;
 
     GtkEntryBuffer *task_name_buf = gtk_entry_get_buffer(GTK_ENTRY(self->task_name));
@@ -170,13 +170,13 @@ newtask_confirmed(NewTaskDiag *self) {
 }
 
 static void
-remove_tag(PlanifiedTagContainer *tag, NewTaskDiag *self) {
+remove_tag(PlanifiedTagContainer *tag, PlanifiedNewentryDialog *self) {
     gtk_flow_box_remove((GtkFlowBox *) self->task_tags, (GtkWidget *) tag);
     self->tag_count--;
 }
 
 static void
-add_tag(NewTaskDiag *self) {
+add_tag(PlanifiedNewentryDialog *self) {
     GtkWidget *tag_c = (GtkWidget *) planified_tag_container_new_entry(TRUE);
     gtk_flow_box_insert((GtkFlowBox *) self->task_tags, tag_c, self->tag_count);
     gtk_widget_set_halign(
@@ -187,7 +187,7 @@ add_tag(NewTaskDiag *self) {
 }
 
 static void
-newtask_diag_init(NewTaskDiag *self) {
+planified_newentry_dialog_init(PlanifiedNewentryDialog *self) {
     gtk_widget_init_template(GTK_WIDGET(self));
     g_signal_connect_swapped (self->confirm_button, "clicked",
                               (GCallback) newtask_confirmed, self);
@@ -204,26 +204,26 @@ newtask_diag_init(NewTaskDiag *self) {
 
 static void
 dispose(GObject *gobject) {
-    gtk_widget_dispose_template(GTK_WIDGET(gobject), NEWTASK_DIAG_TYPE);
+    gtk_widget_dispose_template(GTK_WIDGET(gobject), PLANIFIED_NEWENTRY_DIALOG_TYPE);
 
-    G_OBJECT_CLASS (newtask_diag_parent_class)->dispose(gobject);
+    G_OBJECT_CLASS (planified_newentry_dialog_parent_class)->dispose(gobject);
 }
 
 static void
-newtask_diag_class_init(NewTaskDiagClass *class) {
+planified_newentry_dialog_class_init(PlanifiedNewentryDialogClass *class) {
     gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), "/planified/newtask-dialog.ui");
 
-    gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), NewTaskDiag, task_name);
-    gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), NewTaskDiag, task_deadline);
-    gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), NewTaskDiag, task_timereq);
-    gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), NewTaskDiag, task_tags);
-    gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), NewTaskDiag, task_description);
-    gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), NewTaskDiag, confirm_button);
+    gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), PlanifiedNewentryDialog, task_name);
+    gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), PlanifiedNewentryDialog, task_deadline);
+    gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), PlanifiedNewentryDialog, task_timereq);
+    gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), PlanifiedNewentryDialog, task_tags);
+    gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), PlanifiedNewentryDialog, task_description);
+    gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), PlanifiedNewentryDialog, confirm_button);
 
     GObjectClass *object_class = G_OBJECT_CLASS (class);
 
-    object_class->set_property = newtask_diag_set_property;
-    object_class->get_property = newtask_diag_get_property;
+    object_class->set_property = planified_newentry_dialog_set_property;
+    object_class->get_property = planified_newentry_dialog_get_property;
     object_class->dispose = dispose;
 
     // Potentially remove this prop in favour of having edit-task=NULL mean edit-mode=FALSE
@@ -246,14 +246,15 @@ newtask_diag_class_init(NewTaskDiagClass *class) {
 }
 
 /*
- * Creates a new NewTaskDiag in edit mode
+ * Creates a new PlanifiedNewentryDialog in edit mode
  * Prefills buffers with data taken from `task`,
  * newtask_confirmed will update `task` instead of adding a new entry
  */
-NewTaskDiag *newtask_diag_editmode_new(PlanifiedAppWindow *win, GtkApplication *app, PlanifiedTask *task) {
-    NewTaskDiag *self = g_object_new(NEWTASK_DIAG_TYPE,
-                                     "transient-for", win, "application", app,
-                                     "edit-mode", TRUE, "edit-task", task, NULL);
+PlanifiedNewentryDialog *
+planified_newentry_dialog_editmode_new(PlanifiedAppWindow *win, GtkApplication *app, PlanifiedTask *task) {
+    PlanifiedNewentryDialog *self = g_object_new(PLANIFIED_NEWENTRY_DIALOG_TYPE,
+                                                 "transient-for", win, "application", app,
+                                                 "edit-mode", TRUE, "edit-task", task, NULL);
     g_assert(PLANIFIED_IS_TASK(self->prefill_task));
     gtk_entry_buffer_set_text(gtk_entry_get_buffer(GTK_ENTRY(self->task_name)),
                               planified_task_get_task_text(self->prefill_task), -1);
@@ -294,9 +295,9 @@ NewTaskDiag *newtask_diag_editmode_new(PlanifiedAppWindow *win, GtkApplication *
     return self;
 }
 
-NewTaskDiag *
-newtask_diag_new(PlanifiedAppWindow *win, GtkApplication *app) {
-    return g_object_new(NEWTASK_DIAG_TYPE, "transient-for", win, "application", app, NULL);
+PlanifiedNewentryDialog *
+planified_newentry_dialog_new(PlanifiedAppWindow *win, GtkApplication *app) {
+    return g_object_new(PLANIFIED_NEWENTRY_DIALOG_TYPE, "transient-for", win, "application", app, NULL);
 }
 
 
@@ -304,10 +305,10 @@ void
 newtask_activated(GSimpleAction *action,
                   GVariant *parameter,
                   gpointer app) {
-    NewTaskDiag *dialog;
+    PlanifiedNewentryDialog *dialog;
     GtkWindow *win;
 
     win = gtk_application_get_active_window(GTK_APPLICATION (app));
-    dialog = newtask_diag_new(PLANIFIED_APP_WINDOW(win), GTK_APPLICATION(app));
+    dialog = planified_newentry_dialog_new(PLANIFIED_APP_WINDOW(win), GTK_APPLICATION(app));
     gtk_window_present(GTK_WINDOW (dialog));
 }
