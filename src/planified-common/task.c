@@ -427,6 +427,33 @@ void planified_task_set_description(PlanifiedTask *self, gchar *description) {
     g_object_set(G_OBJECT(self), "description", description, NULL);
 }
 
+/*
+ * Returns the most relevant date associated with this task, puts corresponding property name into `prop`
+ *
+ * Relevancy order:
+ * Schedule
+ * Plan_start
+ * Deadline
+ * NULL
+ *
+ */
+GDateTime *planified_task_get_most_relevant_date(PlanifiedTask *self, gchar **prop) {
+    if (self->schedule != NULL) {
+        *prop = "schedule";
+        return self->schedule;
+    }
+    if (self->plan_start != NULL) {
+        *prop = "plan-start";
+        return self->plan_start;
+    }
+    if (self->deadline != NULL) {
+        *prop = "deadline";
+        return self->deadline;
+    }
+    *prop = NULL;
+    return NULL;
+}
+
 PlanifiedTask *
 planified_task_new(char *task_text,
                    GDateTime *deadline,

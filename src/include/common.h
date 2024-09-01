@@ -101,6 +101,17 @@ void planified_task_set_is_complete(PlanifiedTask *self, gboolean is_complete);
 
 void planified_task_set_description(PlanifiedTask *self, gchar *description);
 
+/*
+ * Returns the most relevant date associated with this task, puts corresponding property name into `prop`
+ *
+ * Relevancy order:
+ * schedule
+ * plan-start
+ * deadline
+ * NULL
+ */
+GDateTime *planified_task_get_most_relevant_date(PlanifiedTask *self, gchar **prop);
+
 PlanifiedTask *
 planified_task_new(char *task_text,
                    GDateTime *deadline,
