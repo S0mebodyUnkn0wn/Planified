@@ -22,6 +22,7 @@ struct _PlanifiedTaskWidget {
     GtkLabel *deadline_label;
     GtkButton *delete_task_button;
     GtkGridView *tag_grid;
+    GtkScrolledWindow *tag_grid_window;
 
 //    GtkPopoverMenu *context_menu;
 
@@ -92,15 +93,15 @@ refresh_data(GObject *_task, GParamSpec *pspec, gpointer _self) {
 
     GListStore *tags = planified_task_get_tags(task_obj);
     if (tags != NULL && (g_list_model_get_n_items((GListModel *) tags) > 0)) {
-        gtk_widget_set_visible((GtkWidget *) self->tag_grid, TRUE);
+        gtk_widget_set_visible((GtkWidget *) self->tag_grid_window, TRUE);
         gtk_grid_view_set_model(self->tag_grid, (GtkSelectionModel *) gtk_no_selection_new((GListModel *) tags));
     } else {
-        gtk_widget_set_visible((GtkWidget *) self->tag_grid, FALSE);
+        gtk_widget_set_visible((GtkWidget *) self->tag_grid_window, FALSE);
     }
     gtk_check_button_set_active(self->complete_button, planified_task_get_is_complete(task_obj));
 
 
-    g_print("Done refreshing task_obj %s (called for: %s)\n", task_text, pspec != NULL ? pspec->name : "NULL");
+//    g_print("Done refreshing task_obj %s (called for: %s)\n", task_text, pspec != NULL ? pspec->name : "NULL");
 }
 
 static void
@@ -171,6 +172,7 @@ planified_task_widget_class_init(PlanifiedTaskWidgetClass *class) {
     gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS(class), PlanifiedTaskWidget, deadline_label);
     gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS(class), PlanifiedTaskWidget, delete_task_button);
     gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS(class), PlanifiedTaskWidget, tag_grid);
+    gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS(class), PlanifiedTaskWidget, tag_grid_window);
 
     GObjectClass *object_class = G_OBJECT_CLASS (class);
 
