@@ -95,11 +95,12 @@ bind_list_header(GtkListItemFactory *factory,
     g_assert(GTK_IS_LIST_HEADER(list_header));
 
     label = gtk_list_header_get_child(list_header);
-    GDateTime *sched = planified_task_get_schedule(task);
+    gchar * date_type;
+    GDateTime *sched = planified_task_get_most_relevant_date(task, &date_type);
     GDateTime *now = g_date_time_new_now_local();
 
 
-    if (planified_task_get_schedule(task) != NULL) {
+    if (sched != NULL) {
         gint diff = g_date_time_get_week_of_year(sched) - g_date_time_get_week_of_year(now);
         gint ddiff = g_date_time_get_day_of_year(sched) - g_date_time_get_day_of_year(now);
         if (IS_SAME_DAY(sched, now))
@@ -146,9 +147,9 @@ filter_func(GObject *item,
     PlanifiedTask *task = PLANIFIED_TASK(item);
     if (planified_task_get_is_complete(task))
         return FALSE;
-    GDateTime *sched = planified_task_get_schedule(task);
-    gboolean is_planned = sched != NULL;
-    if (!is_planned)
+    gchar * date_type;
+    GDateTime *sched = planified_task_get_most_relevant_date(task, &date_type);
+    if (sched == NULL)
         return FALSE;
     GDateTime *now = g_date_time_new_now_local();
     int week_diff = g_date_time_get_week_of_year(sched) - g_date_time_get_week_of_year(now);
@@ -164,8 +165,10 @@ compare_week_func(gconstpointer a,
         return 0;
     PlanifiedTask *task_a = PLANIFIED_TASK(a);
     PlanifiedTask *task_b = PLANIFIED_TASK(b);
-    GDateTime *a_sched = planified_task_get_schedule(task_a);
-    GDateTime *b_sched = planified_task_get_schedule(task_b);
+    gchar * date_type_a;
+    gchar * date_type_b;
+    GDateTime *a_sched = planified_task_get_most_relevant_date(task_a,&date_type_a);
+    GDateTime *b_sched = planified_task_get_most_relevant_date(task_b,&date_type_b);
     GDateTime *now = g_date_time_new_now_local();
 
 
@@ -174,8 +177,8 @@ compare_week_func(gconstpointer a,
 
     gint res;
     // If both are overdue, bunch them together
-    if ((g_date_time_difference(planified_task_get_schedule(task_a), now) < 0) &&
-        (g_date_time_difference(planified_task_get_schedule(task_b), now) < 0) &&
+    if ((g_date_time_difference(a_sched, now) < 0) &&
+        (g_date_time_difference(b_sched, now) < 0) &&
         !IS_SAME_DAY(a_sched, now) && !IS_SAME_DAY(b_sched, now))
         res = 0;
     else if (y_diff != 0)

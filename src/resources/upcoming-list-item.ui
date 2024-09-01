@@ -8,12 +8,33 @@
             <class name="upcoming_entry"/>
         </style>
         <child>
-            <object class="GtkLabel" id="title">
-                <property name="xalign">0</property>
-                <property name="wrap">TRUE</property>
+            <object class="GtkBox">
+                <property name="hexpand">true</property>
+                <property name="spacing">10</property>
+                <child>
+                    <object class="GtkLabel" id="title">
+                        <property name="xalign">0</property>
+                        <property name="wrap">TRUE</property>
+                        <property name="halign">fill</property>
+                        <property name="hexpand">true</property>
 
+
+                    </object>
+                </child>
+                <child>
+                    <object class="GtkLabel" id="detail">
+                        <property name="xalign">1</property>
+                        <property name="yalign">0</property>
+                        <property name="halign">end</property>
+                        <property name="valign">start</property>
+                        <style>
+                            <class name="details_text"/>
+                        </style>
+                    </object>
+                </child>
             </object>
         </child>
+
         <child>
             <object class="GtkLabel" id="description">
                 <property name="xalign">0</property>
