@@ -75,6 +75,8 @@
                                                         <property name="title">Show All Planned</property>
                                                         <property name="child">
                                                             <object class="GtkListView" id="selected_day_list">
+                                                                <property name="margin-start">10</property>
+                                                                <property name="margin-end">10</property>
                                                             </object>
                                                         </property>
                                                     </object>
