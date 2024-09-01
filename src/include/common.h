@@ -125,6 +125,8 @@ planified_task_new(char *task_text,
                    GDateTime *plan_start,
                    gint plan_span);
 
+gchar* get_quantifier(int number);
+
 void planified_task_update_from_sqlite3(PlanifiedTask *self, sqlite3_stmt *fetch_task_stmt);
 
 PlanifiedTask *

@@ -35,21 +35,9 @@ on_date_selected(GtkCalendar *calendar,
     GDateTime *date = gtk_calendar_get_date(calendar);
     PlanifiedPlanningView *self = PLANIFIED_PLANNING_VIEW(_self);
     gchar *date_string = g_date_time_format(date, "Your plans for %A, %B %-e");
-    gchar *quantifier;
-    int dm = g_date_time_get_day_of_month(date);
-    switch ((dm % 10) * (dm < 10 || dm >= 14)) {
-        case 1:
-            quantifier = "st:";
-            break;
-        case 2:
-            quantifier = "nd:";
-            break;
-        case 3:
-            quantifier = "rd:";
-            break;
-        default:
-            quantifier = "th:";
-    }
+
+    gchar* quantifier = get_quantifier(g_date_time_get_day_of_month(date));
+
     gtk_label_set_label(self->selected_day_date_label, strcat(date_string, quantifier));
     planified_itinerary_widget_set_selected_date((PlanifiedItineraryWidget *) self->selected_day_timetable,
                                                  gtk_calendar_get_date((GtkCalendar *) self->planning_calendar));

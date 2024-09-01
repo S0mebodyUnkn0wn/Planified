@@ -3,6 +3,7 @@
 //
 #include "common.h"
 #include <gtk/gtk.h>
+
 /*
  * Moves row to index
  */
@@ -16,4 +17,15 @@ void gtk_list_box_move_row(GtkListBox *self, GtkWidget *row, int index) {
 
 }
 
-
+gchar* get_quantifier(int number) {
+    switch ((number % 10) * (number < 10 || number >= 14)) {
+        case 1:
+            return "st:";
+        case 2:
+            return "nd:";
+        case 3:
+            return "rd:";
+        default:
+            return "th:";
+    }
+}
