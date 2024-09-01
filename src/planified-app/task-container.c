@@ -17,6 +17,7 @@ static GParamSpec *obj_properties[N_PROPERTIES] = {NULL,};
 typedef struct {
     PlanifiedTask *task;
     GtkWidget *context_menu;
+    GSimpleActionGroup *action_group;
 } PlanifiedTaskContainerPrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE(PlanifiedTaskContainer, planified_task_container, GTK_TYPE_BOX)
@@ -146,8 +147,9 @@ static void
 planified_task_container_init(PlanifiedTaskContainer *self) {
     PlanifiedTaskContainerPrivate *priv = planified_task_container_get_instance_private(self);
     gtk_widget_init_template(GTK_WIDGET(self));
-    GSimpleActionGroup *action_group = g_simple_action_group_new();
-    g_action_map_add_action_entries(G_ACTION_MAP(action_group), task_action_entries, G_N_ELEMENTS(task_action_entries),
+    priv->action_group = g_simple_action_group_new();
+    g_action_map_add_action_entries(G_ACTION_MAP(priv->action_group), task_action_entries,
+                                    G_N_ELEMENTS(task_action_entries),
                                     self);
 
     GtkDragSource *dragSource = gtk_drag_source_new();
@@ -167,7 +169,7 @@ planified_task_container_init(PlanifiedTaskContainer *self) {
 
     gtk_widget_add_controller(GTK_WIDGET(self), GTK_EVENT_CONTROLLER(dragSource));
     gtk_widget_add_controller(GTK_WIDGET(self), GTK_EVENT_CONTROLLER(right_click));
-    gtk_widget_insert_action_group(GTK_WIDGET(self), "task", G_ACTION_GROUP(action_group));
+    gtk_widget_insert_action_group(GTK_WIDGET(self), "task", G_ACTION_GROUP(priv->action_group));
 
 }
 
@@ -187,6 +189,10 @@ void self_destruct(PlanifiedTaskContainer *self) {
 
 static void refresh_data(GObject *_task, GParamSpec *pspec, gpointer _self) {
     g_assert(PLANIFIED_IS_TASK_CONTAINER(_self));
+    PlanifiedTaskContainerPrivate *priv = planified_task_container_get_instance_private(_self);
+    g_simple_action_set_enabled( // Disable "unschedule" action if task is not scheduled
+            (GSimpleAction *) g_action_map_lookup_action((GActionMap *) priv->action_group, "unschedule"),
+            planified_task_get_schedule(priv->task) != NULL);
     PLANIFIED_TASK_CONTAINER_GET_CLASS(_self)->refresh_data(_task, pspec, _self);
 }
 
@@ -197,7 +203,6 @@ planified_task_container_set_property(GObject *object,
                                       GParamSpec *pspec) {
     PlanifiedTaskContainerPrivate *priv = planified_task_container_get_instance_private(
             PLANIFIED_TASK_CONTAINER(object));
-    PlanifiedTaskContainer *self = PLANIFIED_TASK_CONTAINER(object);
 
 
     switch ((PldTaskContainerProperty) property_id) {
@@ -210,6 +215,7 @@ planified_task_container_set_property(GObject *object,
                 g_signal_connect_swapped(priv->task, "task-deleted", G_CALLBACK(planified_task_container_self_destruct),
                                          object);
                 g_signal_connect(priv->task, "notify", G_CALLBACK(refresh_data), object);
+
                 refresh_data((GObject *) priv->task, NULL, object);
             }
             break;
