@@ -81,10 +81,15 @@ refresh_data(GObject *_task, GParamSpec *pspec, gpointer _self) {
 
     gtk_label_set_label(self->task_label, task_text);
 
-    if (planified_task_get_deadline(task_obj) != NULL) {
+    if (planified_task_get_schedule(task_obj)!= NULL){
+        gtk_widget_set_visible((GtkWidget *) self->deadline_label, TRUE);
+        gtk_label_set_label(self->deadline_label, g_date_time_format(planified_task_get_schedule(
+                task_obj), "scheduled: %H:%M %d.%m.%Y"));
+    }
+    else if (planified_task_get_deadline(task_obj) != NULL) {
         gtk_widget_set_visible((GtkWidget *) self->deadline_label, TRUE);
         gtk_label_set_label(self->deadline_label, g_date_time_format(planified_task_get_deadline(
-                task_obj), "deadline: %d/%m/%Y"));
+                task_obj), "deadline: %d.%m.%Y"));
 
     } else {
         gtk_label_set_label(self->deadline_label, "");
