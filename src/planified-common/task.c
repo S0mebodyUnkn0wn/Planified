@@ -355,7 +355,7 @@ void planified_task_set_task_text(PlanifiedTask *self, gchar *task_text) {
 void planified_task_set_deadline(PlanifiedTask *self, GDateTime *deadline) {
     if (planified_task_get_deadline(self) == deadline)
         return;
-    g_object_set(self, "deadline", deadline);
+    g_object_set(self, "deadline", deadline, NULL);
 }
 
 void planified_task_set_time_req(PlanifiedTask *self, gint time_req) {
