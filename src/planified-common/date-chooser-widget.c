@@ -41,6 +41,8 @@ open_date_picker(CommonDateChooser *self) {
     if (chosen_date != NULL) {
         gtk_calendar_select_day(GTK_CALENDAR(self->date_chooser_calendar), chosen_date);
         g_date_time_unref(chosen_date);
+    } else {
+        date_selected((GtkCalendar *) self->date_chooser_calendar, self);
     }
     gtk_popover_popup(GTK_POPOVER(self->date_selector_popover));
 
