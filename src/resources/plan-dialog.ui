@@ -39,7 +39,7 @@
                             </object>
                         </child>
                         <child>
-                            <object class="CommonDateChooser">
+                            <object class="CommonDateChooser" id="start_on">
                                 <property name="hexpand">TRUE</property>
                                 <property name="halign">GTK_ALIGN_END</property>
 
@@ -62,7 +62,7 @@
                             </object>
                         </child>
                         <child>
-                            <object class="CommonDateChooser">
+                            <object class="CommonDateChooser" id="finish_by">
                                 <property name="hexpand">TRUE</property>
                                 <property name="halign">GTK_ALIGN_END</property>
 
@@ -75,7 +75,7 @@
                     </object>
                 </child>
                 <child>
-                    <object class="GtkButton">
+                    <object class="GtkButton" id="confirm_button">
                         <property name="vexpand">TRUE</property>
                         <property name="height-request">40</property>
                         <property name="label">Confirm</property>

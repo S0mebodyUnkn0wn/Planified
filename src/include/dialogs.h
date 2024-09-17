@@ -1,6 +1,6 @@
-//
-// Created by somebody on 29/07/24.
-//
+/*
+ * Headers for classes representing different dialog windows
+ */
 
 #ifndef PLANIFIED_DIALOGS_H
 #define PLANIFIED_DIALOGS_H
@@ -32,7 +32,13 @@ newtask_activated(GSimpleAction *action,
 // PlanifiedPlanDialog Methods:
 
 PlanifiedPlanDialog *
-planified_plan_dialog_new(PlanifiedAppWindow *win, GtkApplication *app);
+planified_plan_dialog_new(PlanifiedAppWindow *win, GtkApplication *app, PlanifiedTask *task);
+
+void
+planified_plan_dialog_set_start_date(PlanifiedPlanDialog *self, GDateTime *date);
+
+void
+planified_plan_dialog_set_end_date(PlanifiedPlanDialog *self, GDateTime *date);
 
 void
 planified_plan_dialog_activated(GSimpleAction *action,
