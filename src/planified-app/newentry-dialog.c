@@ -134,6 +134,8 @@ newtask_confirmed(PlanifiedNewentryDialog *self) {
     GDateTime *schedule = self->edit_mode ? planified_task_get_schedule(self->prefill_task) : NULL;
     gint64 is_complete = self->edit_mode ? planified_task_get_is_complete(self->prefill_task) : 0;
     gchar *location = self->edit_mode ? planified_task_get_location(self->prefill_task) : "";
+    GDateTime *plan_start = self->edit_mode ? planified_task_get_plan_start(self->prefill_task) : NULL;
+    gint plan_span = self->edit_mode ? planified_task_get_plan_span(self->prefill_task) : 0;
 
     PlanifiedTask *task = planified_task_new(task_name_text,
                                              deadline,
@@ -144,7 +146,8 @@ newtask_confirmed(PlanifiedNewentryDialog *self) {
                                              is_complete,
                                              rowid,
                                              description,
-                                             NULL, -1);
+                                             plan_start,
+                                             plan_span);
 
     sqlite3 *handle = planified_app_get_db_handle(app);
     g_assert(handle != NULL);
