@@ -133,7 +133,7 @@ planified_tag_container_get_property(GObject *object,
 
     switch ((PlanifiedTagContainerProperty) property_id) {
         case TAG:
-            g_value_take_object(value, self->tag);
+            g_value_set_object(value, self->tag);
             break;
         case DELETABLE:
             g_value_set_boolean(value, self->deletable);

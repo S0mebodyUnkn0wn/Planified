@@ -72,7 +72,8 @@ planified_task_set_property(GObject *object,
             self->time_req = g_value_get_int(value);
             break;
         case TAGS:
-            g_free(self->tags);
+            if (G_IS_OBJECT(self->tags))
+                g_object_unref(self->tags);
             self->tags = g_value_get_object(value);
             break;
         case LOCATION:
@@ -137,7 +138,7 @@ planified_task_get_property(GObject *object,
             g_value_set_int(value, self->time_req);
             break;
         case TAGS:
-            g_value_take_object(value, self->tags);
+            g_value_set_object(value, self->tags);
             break;
         case LOCATION:
             g_value_set_string(value, self->location);
@@ -181,6 +182,8 @@ planified_task_dispose(GObject *gobject) {
         g_date_time_unref(self->plan_start);
     if (self->schedule)
         g_date_time_unref(self->schedule);
+    if (self->tags)
+        g_object_unref(self->tags);
 
     G_OBJECT_CLASS (planified_task_parent_class)->dispose(gobject);
 }
@@ -439,18 +442,22 @@ void planified_task_set_description(PlanifiedTask *self, gchar *description) {
  */
 GDateTime *planified_task_get_most_relevant_date(PlanifiedTask *self, gchar **prop) {
     if (self->schedule != NULL) {
-        *prop = "schedule";
+        if (prop != NULL)
+            *prop = "schedule";
         return self->schedule;
     }
     if (self->plan_start != NULL) {
-        *prop = "plan-start";
+        if (prop != NULL)
+            *prop = "plan-start";
         return self->plan_start;
     }
     if (self->deadline != NULL) {
-        *prop = "deadline";
+        if (prop != NULL)
+            *prop = "deadline";
         return self->deadline;
     }
-    *prop = NULL;
+    if (prop != NULL)
+        *prop = NULL;
     return NULL;
 }
 

@@ -33,9 +33,12 @@ update_clock(GtkWidget *widget, GdkFrameClock *frame_clock, gpointer data) {
 
     if (GTK_IS_LABEL(clock_widget)) {
         GDateTime *current_time = g_date_time_new_now_local();
-        gtk_label_set_label(GTK_LABEL(clock_widget), g_date_time_format(current_time, "%H:%M:%S"));
-        gtk_label_set_label(GTK_LABEL(date_widget), g_date_time_format(current_time, "%A, %B %d"));
-
+        gchar *time_str =  g_date_time_format(current_time, "%H:%M:%S");
+        gchar *date_str =  g_date_time_format(current_time, "%A, %B %d");
+        gtk_label_set_label(GTK_LABEL(clock_widget),time_str);
+        gtk_label_set_label(GTK_LABEL(date_widget),date_str);
+        g_free(time_str);
+        g_free(date_str);
         g_date_time_unref(current_time);
         return G_SOURCE_CONTINUE;
     }
