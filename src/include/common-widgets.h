@@ -1,6 +1,7 @@
-//
-// Created by somebody on 15/07/24.
-//
+/**
+ * Headers for commonly used widgets that can be used outside of planified.
+ * Basically everything that defined in planified-common and is a widget
+ */
 
 #ifndef PLANIFIED_COMMON_WIDGETS_H
 #define PLANIFIED_COMMON_WIDGETS_H

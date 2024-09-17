@@ -1,7 +1,6 @@
-//
-// Created by somebody on 29/07/24.
-//
-
+/**
+ * Headers for derivable widget classes
+ */
 #ifndef PLANIFIED_DERIVABLE_WIDGETS_H
 #define PLANIFIED_DERIVABLE_WIDGETS_H
 #include "common.h"

@@ -1,6 +1,6 @@
-//
-// Created by somebody on 05/05/24.
-//
+/**
+ * Headers for most of planified's widgets.
+ */
 
 #ifndef PLANIFIED_WIDGETS_H
 #define PLANIFIED_WIDGETS_H

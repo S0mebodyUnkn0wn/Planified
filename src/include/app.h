@@ -1,3 +1,7 @@
+/**
+ * Headers for PlanifiedApp and PlanifiedAppWindow and their methods/functions
+ */
+
 #ifndef PLANIFIED_APP_H
 #define PLANIFIED_APP_H
 

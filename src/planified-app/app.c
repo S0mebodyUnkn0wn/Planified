@@ -3,7 +3,7 @@
 #include "app.h"
 #include "widgets.h"
 #include "storage.h"
-//#include <adwaita.h>
+//#include <adwaita.h> adwaita is evil
 #include "dialogs.h"
 /* PlanifiedApp - a Subclass of GApplication with some custom handlers etc. */
 
@@ -18,6 +18,9 @@ typedef struct SQLiteHookData {
     sqlite3_int64 rowid;
 } SQLiteHookData;
 
+/**
+ * Returns a database handle associated with this app
+ */
 sqlite3 *get_handle(GtkWidget *self) {
     PlanifiedAppWindow *window = PLANIFIED_APP_WINDOW(
             gtk_widget_get_ancestor(GTK_WIDGET(self), PLANIFIED_APP_WINDOW_TYPE));
@@ -28,6 +31,11 @@ sqlite3 *get_handle(GtkWidget *self) {
     return handle;
 }
 
+/**
+ * Returns a planified app responsible for this widget.
+ *
+ * If widget is not a part of planified app this function will fail
+ */
 PlanifiedApp *
 get_planified_app(GtkWidget *self) {
     PlanifiedAppWindow *window = PLANIFIED_APP_WINDOW(
@@ -38,7 +46,7 @@ get_planified_app(GtkWidget *self) {
     return app;
 }
 
-
+//Handler for app.preferences
 static void
 preferences_activated(GSimpleAction *action,
                       GVariant *parameter,
@@ -92,7 +100,9 @@ struct _PlanifiedApp {
 
 G_DEFINE_TYPE(PlanifiedApp, planified_app, GTK_TYPE_APPLICATION);
 
-
+/**
+ * Get an index of a task with `rowid` in `arr`
+ */
 gint
 task_array_find_task_pos_by_rowid(GListStore *arr, gint64 rowid) {
     for (guint i = 0; i < g_list_model_get_n_items(G_LIST_MODEL(arr)); i++) {
@@ -150,7 +160,7 @@ planified_app_update_task(SQLiteHookData *data) {
             planified_task_update_from_sqlite3(old_task, fetch_task_stmt);
             tags = database_get_tags_of_task(handle, new_task);
             planified_task_replace_tags_from_store(new_task, tags);
-            g_list_model_items_changed((GListModel *) self->tasks, old_task_pos, 1, 1);
+            g_list_model_items_changed((GListModel *) self->tasks, old_task_pos, 1, 1); //TODO: leaks memory badly
             g_object_unref(tags);
             break;
         default:
@@ -204,9 +214,15 @@ planified_app_update_tags(SQLiteHookData *data) {
 
 }
 
+/**
+ * Schedules a task update in exactly 100 ms. Use this function as a callback for sqlite hooks,
+ * this ensures that sqlite transaction finishes before we start pulling data from the database
+ */
 void
 planified_app_schedule_task_update(void *app, int operation, char const *db_name, char const *table_name,
                                    sqlite3_int64 rowid) {
+    // sqlite is picky with the statements being executed mid-transaction, so we have to queue them this way
+    // since g_timeout only takes one user_data, we'll package it into a structure
     if (strcmp(table_name, "tasks") == 0) {
         SQLiteHookData *data = malloc(sizeof(SQLiteHookData));
         data->user_data = app;
@@ -214,13 +230,12 @@ planified_app_schedule_task_update(void *app, int operation, char const *db_name
         data->db_name = db_name;
         data->table_name = table_name;
         data->rowid = rowid;
-
         g_timeout_add_once(100, (GSourceOnceFunc) planified_app_update_task, data);
     }
 
 }
 
-static void
+static void // GTK theming is wierd and slightly broken, so we'll ensure that we force a dark theme, if the user requests it
 sync_colors(GSettings *g_settings) {
     if (strcmp("prefer-dark", g_settings_get_string(g_settings, "color-scheme")) == 0) {
         g_object_set(gtk_settings_get_default(), "gtk-application-prefer-dark-theme", 1, NULL);
@@ -241,14 +256,18 @@ planified_app_startup(GApplication *app) {
 
     PlanifiedApp *_app = PLANIFIED_APP(app);
     sqlite3 *handle;
-    char *DB_FILEPATH = g_strconcat(g_get_home_dir(),"/.local/share/planified/data",NULL);
+    char *DB_FILEPATH = g_strconcat(g_get_home_dir(), "/.local/share/planified/data", NULL);
     int status = init_sqlite_db(&handle, DB_FILEPATH);
     g_print("STATUS: %d", status);
     _app->handle = handle;
+
+    // Pull up and apply the custom styling info
     GtkCssProvider *css = gtk_css_provider_new();
     gtk_css_provider_load_from_resource(css, "/planified/style.css");
     gtk_style_context_add_provider_for_display(gdk_display_get_default(), (GtkStyleProvider *) css,
                                                GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+
+    // Resolve the color scheme request and adjust accordingly
     GSettings *g_settings = g_settings_new("org.gnome.desktop.interface");
     g_signal_connect_swapped(g_settings, "changed::color-scheme", G_CALLBACK(sync_colors), g_settings);
     sync_colors(g_settings);
@@ -256,6 +275,7 @@ planified_app_startup(GApplication *app) {
     // Subscribe to SQL updates
     sqlite3_update_hook(handle, planified_app_schedule_task_update, app);
 
+    // Initialise the task array
     sqlite3_stmt *fetch_task_stmt;
     sqlite3_prepare_v2(handle,
                        "SELECT * FROM tasks;",
@@ -267,14 +287,14 @@ planified_app_startup(GApplication *app) {
         g_list_store_append(_app->tasks, task);
         g_object_unref(task);
     }
-    g_signal_emit(_app, obj_signals[TASK_ARRAY_UPDATED], 0, SQLITE_INSERT, NULL);
+//    g_signal_emit(_app, obj_signals[TASK_ARRAY_UPDATED], 0, SQLITE_INSERT, NULL);
 
 }
 
 static void
 planified_app_init(PlanifiedApp *app) {
-    app->deferred_update_operation = -1;
-    app->deferred_update_rowid = -1;
+//    app->deferred_update_operation = -1;
+//    app->deferred_update_rowid = -1;
     app->tasks = g_list_store_new(PLANIFIED_TASK_TYPE);
 
 
@@ -289,7 +309,6 @@ planified_app_activate(GApplication *app) {
     planified_app_window_setup(window);
     g_signal_emit(app, obj_signals[TASK_ARRAY_UPDATED], 0, SQLITE_INSERT, NULL);
     gtk_window_present(GTK_WINDOW(window));
-
 }
 
 static void

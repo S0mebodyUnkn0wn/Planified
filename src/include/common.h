@@ -1,7 +1,7 @@
-//
-// Created by somebody on 02/05/24.
-//
-
+/**
+ * Headers for commonly used classes, functions and macros.
+ * Basically everything that defined in planified-common and isn't a widget
+ */
 #ifndef PLANIFIED_COMMON_H
 #define PLANIFIED_COMMON_H
 
@@ -125,7 +125,7 @@ planified_task_new(char *task_text,
                    GDateTime *plan_start,
                    gint plan_span);
 
-gchar* get_quantifier(int number);
+gchar *get_quantifier(int number);
 
 void planified_task_update_from_sqlite3(PlanifiedTask *self, sqlite3_stmt *fetch_task_stmt);
 

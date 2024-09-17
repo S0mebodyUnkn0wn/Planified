@@ -1,6 +1,8 @@
-//
-// Created by somebody on 05/05/24.
-//
+/**
+ * Headers for functions used for modifying the sqlite database, basically everything defined in sqlite-manager.
+ *
+ * Also contains macros with current database schemas
+ */
 
 #ifndef PLANIFIED_STORAGE_H
 #define PLANIFIED_STORAGE_H

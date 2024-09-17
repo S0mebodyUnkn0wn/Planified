@@ -19,22 +19,7 @@ struct _PlanifiedAppWindow {
 G_DEFINE_TYPE(PlanifiedAppWindow, planified_app_window, GTK_TYPE_APPLICATION_WINDOW)
 
 
-
-//static void
-//planified_itinerary_widget_refresh_data(GFileMonitor *self,
-//             GFile *file,
-//             GFile *other_file,
-//             GFileMonitorEvent event_type,
-//             gpointer user_data) {
-//    g_print("Refresh started (in window)\n");
-//
-//    PlanifiedAppWindow *window = PLANIFIED_APP_WINDOW(user_data);
-//    g_assert(PLANIFIED_IS_APP_WINDOW(window));
-//
-//    planified_timetable_view_reload_data(window->timetable);
-//}
-
-static void
+static void // Handler for the go-to action, jumps to requested window by name
 go_to_activated(GSimpleAction* action,
                 GVariant* parameter,
                 gpointer user_data){
