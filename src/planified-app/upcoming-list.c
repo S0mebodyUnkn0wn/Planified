@@ -152,9 +152,15 @@ filter_func(GObject *item,
     if (sched == NULL)
         return FALSE;
     GDateTime *now = g_date_time_new_now_local();
-    int week_diff = g_date_time_get_week_of_year(sched) - g_date_time_get_week_of_year(now);
+    gboolean include = false;
+    if (g_str_equal(date_type,"plan-start")){
+        GDateTime *plan_end = g_date_time_add_days(sched, planified_task_get_plan_span(task));
+        include = g_date_time_compare(now,sched) >= 0 && g_date_time_compare(now,plan_end) <=0;
+        g_date_time_unref(plan_end);
+    }
+    else include = g_date_time_get_week_of_year(sched) - g_date_time_get_week_of_year(now) <= 1;
     g_date_time_unref(now);
-    return (week_diff <= 1);
+    return include;
 }
 
 static gint
@@ -177,10 +183,14 @@ compare_week_func(gconstpointer a,
 
     gint res;
     // If both are overdue, bunch them together
-    if ((g_date_time_difference(a_sched, now) < 0) &&
-        (g_date_time_difference(b_sched, now) < 0) &&
+    if ((g_date_time_compare_fixed(a_sched, now,PLANIFIED_COMPARISON_PRECISION_DAY) < 0) &&
+        (g_date_time_compare_fixed(b_sched, now,PLANIFIED_COMPARISON_PRECISION_DAY) < 0) &&
         !IS_SAME_DAY(a_sched, now) && !IS_SAME_DAY(b_sched, now))
         res = 0;
+    else if (g_date_time_compare_fixed(a_sched, now,PLANIFIED_COMPARISON_PRECISION_DAY) < 0)
+        res = -1;
+    else if (g_date_time_compare_fixed(b_sched, now,PLANIFIED_COMPARISON_PRECISION_DAY) < 0)
+        res = 1;
     else if (y_diff != 0)
         res = y_diff;
     else if (IS_SAME_DAY(a_sched, now) != IS_SAME_DAY(b_sched, now))
@@ -202,10 +212,10 @@ compare_day_func(gconstpointer a,
         return 0;
     PlanifiedTask *task_a = PLANIFIED_TASK(a);
     PlanifiedTask *task_b = PLANIFIED_TASK(b);
-    GDateTime *b_sched = (planified_task_get_schedule(task_b));
-    GDateTime *a_sched = (planified_task_get_schedule(task_a));
-    gint diff = (gint) g_date_time_difference(a_sched, b_sched) % INT_MAX;
-    return diff;
+    GDateTime *a_sched = (planified_task_get_most_relevant_date(task_a, NULL));
+    GDateTime *b_sched = (planified_task_get_most_relevant_date(task_b,NULL));
+    gint64 diff = g_date_time_difference(a_sched, b_sched);
+    return diff > 0 ? 1 : (diff == 0 ) ? 0 : -1;
 }
 
 void
