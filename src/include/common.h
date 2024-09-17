@@ -135,4 +135,18 @@ planified_task_new_from_sqlite(sqlite3_stmt *fetch_task_stmt);
 PlanifiedTag *
 planified_tag_new_from_sqlite(sqlite3_stmt *fetch_stmt);
 
+typedef enum {
+    PLANIFIED_COMPARISON_PRECISION_YEAR = 1,
+    PLANIFIED_COMPARISON_PRECISION_MONTH,
+    PLANIFIED_COMPARISON_PRECISION_DAY,
+    PLANIFIED_COMPARISON_PRECISION_HOUR,
+    PLANIFIED_COMPARISON_PRECISION_MINUTE,
+    PLANIFIED_COMPARISON_PRECISION_SECOND,
+    PLANIFIED_COMPARISON_PRECISION_MICROSECOND,
+
+} PlanifiedComparisonPrecision;
+
+// y m d h m s ms
+gint g_date_time_compare_fixed(GDateTime *a, GDateTime *b, PlanifiedComparisonPrecision precision);
+
 #endif //PLANIFIED_COMMON_H

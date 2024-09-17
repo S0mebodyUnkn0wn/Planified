@@ -29,3 +29,40 @@ gchar* get_quantifier(int number) {
             return "th:";
     }
 }
+
+// y m d h m s ms
+gint g_date_time_compare_fixed(GDateTime *a, GDateTime *b, PlanifiedComparisonPrecision precision) {
+    guint c = 1;
+    int res = 0;
+    while (res == 0 && c <= precision) {
+        int diff;
+        switch ((PlanifiedComparisonPrecision) c) {
+            case PLANIFIED_COMPARISON_PRECISION_YEAR:
+                diff = (g_date_time_get_year(a) - g_date_time_get_year(b));
+                break;
+            case PLANIFIED_COMPARISON_PRECISION_MONTH:
+                diff = (g_date_time_get_month(a) - g_date_time_get_month(b));
+                break;
+            case PLANIFIED_COMPARISON_PRECISION_DAY:
+                diff = (g_date_time_get_day_of_month(a) - g_date_time_get_day_of_month(b));
+                break;
+            case PLANIFIED_COMPARISON_PRECISION_HOUR:
+                diff = (g_date_time_get_hour(a) - g_date_time_get_hour(b));
+                break;
+            case PLANIFIED_COMPARISON_PRECISION_MINUTE:
+                diff = (g_date_time_get_minute(a) - g_date_time_get_minute(b));
+                break;
+            case PLANIFIED_COMPARISON_PRECISION_SECOND:
+                diff = (g_date_time_get_second(a) - g_date_time_get_second(b));
+                break;
+            case PLANIFIED_COMPARISON_PRECISION_MICROSECOND:
+                diff = (g_date_time_get_microsecond(a) - g_date_time_get_microsecond(b));
+                break;
+            default:
+                diff = 0;
+        }
+        res = diff == 0 ? 0 : (diff > 0 ? 1 : -1);
+        c++;
+    }
+    return res;
+}
