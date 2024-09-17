@@ -21,7 +21,7 @@ struct _PlanifiedTaskWidget {
     GtkLabel *task_label;
     GtkLabel *deadline_label;
     GtkButton *delete_task_button;
-    GtkGridView *tag_grid;
+    GtkListView *tag_grid;
     GtkScrolledWindow *tag_grid_window;
 
 //    GtkPopoverMenu *context_menu;
@@ -47,12 +47,13 @@ bind_list_item(GtkListItemFactory *factory,
                GtkListItem *list_item) {
     GtkWidget *widget;
     PlanifiedTag *tag = gtk_list_item_get_item(list_item);
-
-    widget = (GtkWidget *) planified_tag_container_new(tag, FALSE);
-    gtk_widget_set_vexpand(widget, TRUE);
-    gtk_widget_set_valign(widget, GTK_ALIGN_CENTER);
-    gtk_widget_set_halign(widget, GTK_ALIGN_END);
-
+    g_assert(G_IS_OBJECT(tag));
+    widget = /*gtk_label_new(planified_tag_get_name(tag));//*/(GtkWidget *) planified_tag_container_new(tag, FALSE);
+//    g_assert(G_IS_OBJECT(widget));
+//    gtk_widget_set_vexpand(widget, TRUE);
+//    gtk_widget_set_valign(widget, GTK_ALIGN_CENTER);
+//    gtk_widget_set_halign(widget, GTK_ALIGN_END);
+//
     gtk_list_item_set_child(list_item, widget);
 //    g_print("bound\n");
 }
@@ -81,27 +82,28 @@ refresh_data(GObject *_task, GParamSpec *pspec, gpointer _self) {
 
     gtk_label_set_label(self->task_label, task_text);
 
-    if (planified_task_get_schedule(task_obj)!= NULL){
+    if (planified_task_get_schedule(task_obj) != NULL) {
         gtk_widget_set_visible((GtkWidget *) self->deadline_label, TRUE);
-        gtk_label_set_label(self->deadline_label, g_date_time_format(planified_task_get_schedule(
-                task_obj), "scheduled: %H:%M %d.%m.%Y"));
-    }
-    else if (planified_task_get_deadline(task_obj) != NULL) {
+        gchar *label_str = g_date_time_format(planified_task_get_schedule(task_obj), "scheduled: %H:%M %d.%m.%Y");
+        gtk_label_set_label(self->deadline_label, label_str);
+        g_free(label_str);
+    } else if (planified_task_get_deadline(task_obj) != NULL) {
         gtk_widget_set_visible((GtkWidget *) self->deadline_label, TRUE);
-        gtk_label_set_label(self->deadline_label, g_date_time_format(planified_task_get_deadline(
-                task_obj), "deadline: %d.%m.%Y"));
-
+        gchar *label_str = g_date_time_format(planified_task_get_deadline(task_obj), "deadline: %d.%m.%Y");
+        gtk_label_set_label(self->deadline_label, label_str);
+        g_free(label_str);
     } else {
         gtk_label_set_label(self->deadline_label, "");
         gtk_widget_set_visible((GtkWidget *) self->deadline_label, FALSE);
     }
 
     GListStore *tags = planified_task_get_tags(task_obj);
-    if (tags != NULL && (g_list_model_get_n_items((GListModel *) tags) > 0)) {
-        gtk_widget_set_visible((GtkWidget *) self->tag_grid_window, TRUE);
-        gtk_grid_view_set_model(self->tag_grid, (GtkSelectionModel *) gtk_no_selection_new((GListModel *) tags));
+    if (G_IS_OBJECT(tags) && (g_list_model_get_n_items((GListModel *) tags) > 0)) {
+//        gtk_widget_set_visible((GtkWidget *) self->tag_grid_window, TRUE);
+        // TODO: grid does not take ownership of the model!
+        gtk_list_view_set_model(self->tag_grid, (GtkSelectionModel *) gtk_no_selection_new((GListModel *) tags));
     } else {
-        gtk_widget_set_visible((GtkWidget *) self->tag_grid_window, FALSE);
+//        gtk_widget_set_visible((GtkWidget *) self->tag_grid_window, FALSE);
     }
     gtk_check_button_set_active(self->complete_button, planified_task_get_is_complete(task_obj));
 
@@ -130,7 +132,7 @@ planified_task_widget_init(PlanifiedTaskWidget *widget) {
     g_signal_connect (item_factory, "bind", G_CALLBACK(bind_list_item), NULL);
     g_signal_connect (item_factory, "unbind", G_CALLBACK(unbind_list_item), NULL);
     g_signal_connect (item_factory, "teardown", G_CALLBACK(teardown_list_item), NULL);
-    gtk_grid_view_set_factory(widget->tag_grid, item_factory);
+    gtk_list_view_set_factory(widget->tag_grid, item_factory);
 //    gtk_scrollable_set_vscroll_policy((GtkScrollable *) widget->tag_grid, GTK_SCROLL_NATURAL);
 
 
@@ -177,7 +179,7 @@ planified_task_widget_class_init(PlanifiedTaskWidgetClass *class) {
     gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS(class), PlanifiedTaskWidget, deadline_label);
     gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS(class), PlanifiedTaskWidget, delete_task_button);
     gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS(class), PlanifiedTaskWidget, tag_grid);
-    gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS(class), PlanifiedTaskWidget, tag_grid_window);
+//    gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS(class), PlanifiedTaskWidget, tag_grid_window);
 
     GObjectClass *object_class = G_OBJECT_CLASS (class);
 
@@ -214,7 +216,5 @@ planified_task_widget_new(PlanifiedTask *task) {
     PlanifiedTaskWidget *self = g_object_new(PLANIFIED_TASK_WIDGET_TYPE,
                                              "task", task,
                                              NULL);
-//    g_signal_connect_swapped(task, "notify", G_CALLBACK(refresh_data), self);
-//    refresh_data(NULL,NULL,self);
     return self;
 }
