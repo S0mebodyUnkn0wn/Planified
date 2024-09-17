@@ -267,8 +267,7 @@ planified_newentry_dialog_editmode_new(PlanifiedAppWindow *win, GtkApplication *
                                                  "transient-for", win, "application", app,
                                                  "edit-mode", TRUE, "edit-task", task, NULL);
     g_assert(PLANIFIED_IS_TASK(self->prefill_task));
-    gtk_entry_buffer_set_text(gtk_entry_get_buffer(GTK_ENTRY(self->task_name)),
-                              planified_task_get_task_text(self->prefill_task), -1);
+    gtk_editable_set_text(GTK_EDITABLE(self->task_name),planified_task_get_task_text(self->prefill_task));
 
     // Prefill the description
     if (planified_task_get_description(self->prefill_task) != NULL) {
@@ -278,8 +277,9 @@ planified_newentry_dialog_editmode_new(PlanifiedAppWindow *win, GtkApplication *
 
     // Prefill the deadline
     if (planified_task_get_deadline(self->prefill_task) != NULL) {
-        gtk_entry_buffer_set_text(gtk_entry_get_buffer(GTK_ENTRY(self->task_deadline)),
-                                  g_date_time_format(planified_task_get_deadline(self->prefill_task), "%d/%m/%Y"), -1);
+        gchar *deadline_str = g_date_time_format(planified_task_get_deadline(self->prefill_task), "%d/%m/%Y");
+        gtk_editable_set_text(GTK_EDITABLE(self->task_deadline),deadline_str);
+        g_free(deadline_str);
     }
 
     // Prefill the time requirement
