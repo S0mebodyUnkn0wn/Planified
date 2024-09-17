@@ -2,6 +2,7 @@
 #include "app.h"
 #include "common-widgets.h"
 #include "common.h"
+#include "dialogs.h"
 #include <gtk/gtk.h>
 
 
@@ -24,6 +25,8 @@ struct _PlanifiedPlanningView {
 
     GtkLabel *selected_day_date_label;
     GtkFilter *filter_relevant;
+    GtkSorter *section_sorter;
+    GListModel *day_model;
 };
 
 G_DEFINE_FINAL_TYPE(PlanifiedPlanningView, planified_planning_view, GTK_TYPE_BOX)
@@ -36,12 +39,18 @@ on_date_selected(GtkCalendar *calendar,
     PlanifiedPlanningView *self = PLANIFIED_PLANNING_VIEW(_self);
     gchar *date_string = g_date_time_format(date, "Your plans for %A, %B %-e");
 
-    gchar* quantifier = get_quantifier(g_date_time_get_day_of_month(date));
+    gchar *quantifier = get_quantifier(g_date_time_get_day_of_month(date));
 
     gtk_label_set_label(self->selected_day_date_label, strcat(date_string, quantifier));
     planified_itinerary_widget_set_selected_date((PlanifiedItineraryWidget *) self->selected_day_timetable,
                                                  gtk_calendar_get_date((GtkCalendar *) self->planning_calendar));
+    gtk_list_view_set_model((GtkListView *) self->selected_day_list, NULL);
+    gtk_list_view_set_model((GtkListView *) self->selected_day_list, (GtkSelectionModel *) self->day_model);
     gtk_filter_changed(self->filter_relevant, GTK_FILTER_CHANGE_DIFFERENT);
+    if (g_list_model_get_n_items(G_LIST_MODEL(self->day_model)) != 0)
+        gtk_section_model_sections_changed((GtkSectionModel *) self->day_model, 0,
+                                           g_list_model_get_n_items(G_LIST_MODEL(self->day_model)));
+
 
     g_free(date_string);
     g_date_time_unref(date);
@@ -65,8 +74,9 @@ filter_func(GObject *item,
 
     if ((sched != NULL && IS_SAME_DAY(open_date, sched)) ||
         (deadline != NULL && IS_SAME_DAY(open_date, deadline)) ||
-        (plan_start != NULL && g_date_time_compare(open_date, plan_start) >= 0 &&
-         g_date_time_compare(open_date, plan_end) <= 0)) {
+        (plan_start != NULL &&
+         g_date_time_compare_fixed(open_date, plan_start, PLANIFIED_COMPARISON_PRECISION_DAY) >= 0 &&
+         g_date_time_compare_fixed(open_date, plan_end, PLANIFIED_COMPARISON_PRECISION_DAY) <= 0)) {
         include = true;
     }
     if (plan_end)
@@ -82,29 +92,37 @@ sort_to_sections(gconstpointer a,
                  gpointer user_data) {
     PlanifiedTask *task_a = PLANIFIED_TASK(a);
     PlanifiedTask *task_b = PLANIFIED_TASK(b);
+    GDateTime *sched_a = planified_task_get_schedule(task_a);
+    GDateTime *deadline_a = planified_task_get_deadline(task_a);
 
+    GDateTime *sched_b = planified_task_get_schedule(task_b);
+    GDateTime *deadline_b = planified_task_get_deadline(task_b);
     PlanifiedPlanningView *self = PLANIFIED_PLANNING_VIEW(user_data);
+    GDateTime *selected_date = gtk_calendar_get_date((GtkCalendar *) self->planning_calendar);
 
-    if (planified_task_get_schedule(task_b) != NULL || planified_task_get_schedule(task_a) != NULL) {
-        if (planified_task_get_schedule(task_b) != NULL && planified_task_get_schedule(task_a) != NULL)
-            return 0;
-        else
-            return planified_task_get_schedule(task_a) == NULL ? 1 : -1;
+    int res = 0;
+
+    bool b_is_sched = sched_b != NULL && IS_SAME_DAY(sched_b, selected_date);
+    bool b_is_deadline = deadline_b != NULL && IS_SAME_DAY(deadline_b, selected_date);
+
+    if (sched_a != NULL && IS_SAME_DAY(sched_a, selected_date)) {
+        // a is a sched, b is a equal if sched, otherwise lower
+        res = b_is_sched ? 0
+                         : 1;
+    } else if (deadline_a != NULL && IS_SAME_DAY(deadline_a, selected_date)) {
+        // a is a deadline, b is higher if sched, otherwise if b is deadline b id equal, otherwise lower
+        res = b_is_sched ? 1
+                         : b_is_deadline ? 0
+                                         : -1;
+    } else { // a is a plan, b is higher if sched or deadline
+        res = b_is_sched || b_is_deadline ? 1
+                                          : 0;
     }
-    if (planified_task_get_deadline(task_b) != NULL || planified_task_get_deadline(task_a) != NULL) {
-        if (planified_task_get_deadline(task_b) != NULL && planified_task_get_deadline(task_a) != NULL)
-            return 0;
-        else
-            return planified_task_get_deadline(task_a) == NULL ? 1 : -1;
-    }
-    if (planified_task_get_plan_start(task_b) != NULL || planified_task_get_plan_start(task_a) != NULL) {
-        if (planified_task_get_plan_start(task_b) != NULL && planified_task_get_plan_start(task_a) != NULL) {
-            return 0;
-        }
-        else
-            return planified_task_get_plan_start(task_a) == NULL ? 1 : -1;
-    }
-    return 0;
+
+
+    g_date_time_unref(selected_date);
+
+    return res;
 }
 
 static void
@@ -194,9 +212,10 @@ bind_list_header(GtkListItemFactory *factory,
         gtk_label_set_label(label, "Scheduled:");
     } else if (deadline != NULL && IS_SAME_DAY(deadline, selected_date)) {
         gtk_label_set_label(label, "Tasks Due:");
-    } else if (plan_start != NULL && g_date_time_compare(selected_date, plan_start) >= 0 &&
-               g_date_time_compare(selected_date, plan_end) <= 0) {
-        gtk_label_set_label(label, "Tasks in the works:");
+    } else if (plan_start != NULL &&
+               g_date_time_compare_fixed(selected_date, plan_start, PLANIFIED_COMPARISON_PRECISION_DAY) >= 0 &&
+               g_date_time_compare_fixed(selected_date, plan_end, PLANIFIED_COMPARISON_PRECISION_DAY) <= 0) {
+        gtk_label_set_label(label, "Tasks in progress:");
     }
 
     g_date_time_unref(selected_date);
@@ -219,10 +238,40 @@ teardown_list_header(GtkListItemFactory *factory,
                      GtkListHeader *list_header) {
 }
 
+static gboolean
+on_drop(GtkDropTarget *target,
+        const GValue *value,
+        double x,
+        double y,
+        gpointer data) {
+
+    PlanifiedPlanningView *self = data;
+    g_assert(PLANIFIED_IS_PLANNING_VIEW(self));
+
+    if (G_VALUE_HOLDS(value, PLANIFIED_TASK_TYPE)) {
+        PlanifiedTask *task = g_value_get_object(value);
+        g_assert(PLANIFIED_IS_TASK(task));
+
+        PlanifiedPlanDialog *dialog = planified_plan_dialog_new(
+                (PlanifiedAppWindow *) gtk_widget_get_ancestor((GtkWidget *) self, GTK_TYPE_WINDOW),
+                (GtkApplication *) get_planified_app((GtkWidget *) self),
+                task);
+        GDateTime *date = gtk_calendar_get_date((GtkCalendar *) self->planning_calendar);
+        GDateTime *start_date = planified_task_get_plan_start(task);
+        if (start_date != NULL && g_date_time_compare_fixed(start_date, date, PLANIFIED_COMPARISON_PRECISION_DAY) < 0)
+            planified_plan_dialog_set_end_date(dialog, date);
+        else
+            planified_plan_dialog_set_start_date(dialog, date);
+        g_date_time_unref(date);
+        gtk_window_present((GtkWindow *) dialog);
+        return TRUE;
+    } else return FALSE;
+}
+
+
 static void
 planified_planning_view_init(PlanifiedPlanningView *self) {
     gtk_widget_init_template(GTK_WIDGET(self));
-    g_signal_connect(self->planning_calendar, "day-selected", G_CALLBACK(on_date_selected), self);
 
     GtkListItemFactory *item_factory = gtk_signal_list_item_factory_new();
     g_signal_connect (item_factory, "setup", G_CALLBACK(setup_list_item), NULL);
@@ -236,6 +285,14 @@ planified_planning_view_init(PlanifiedPlanningView *self) {
     g_signal_connect (header_factory, "teardown", G_CALLBACK(teardown_list_header), NULL);
     gtk_list_view_set_factory((GtkListView *) self->selected_day_list, item_factory);
     gtk_list_view_set_header_factory((GtkListView *) self->selected_day_list, header_factory);
+
+    GtkDropTarget *drop_target = gtk_drop_target_new(PLANIFIED_TASK_TYPE, GDK_ACTION_MOVE);
+    g_signal_connect(drop_target, "drop", G_CALLBACK(on_drop), self);
+    g_signal_connect(self->planning_calendar, "day-selected", G_CALLBACK(on_date_selected), self);
+
+
+    gtk_widget_add_controller(GTK_WIDGET(self), GTK_EVENT_CONTROLLER(drop_target));
+
 
 }
 
@@ -257,12 +314,14 @@ planified_planning_view_class_init(PlanifiedPlanningViewClass *class) {
 }
 
 static void
-update_details(GtkSelectionModel *model,
-               guint position,
-               guint n_items,
-               gpointer user_data) {
+update_details(gpointer user_data) {
     PlanifiedPlanningView *self = PLANIFIED_PLANNING_VIEW(user_data);
     PlanifiedTask *task = planified_task_list_get_selected((PlanifiedTaskList *) self->planning_task_list);
+    if (task == NULL) {
+        gtk_label_set_label(self->details_task_title, "");
+        gtk_label_set_label(self->details_task_description, "");
+        return;
+    }
     gtk_label_set_label(self->details_task_title, planified_task_get_task_text(task));
     if (strlen(planified_task_get_description(task)) > 0) {
         gtk_widget_set_visible((GtkWidget *) self->details_task_description, TRUE);
@@ -278,16 +337,23 @@ void planified_planning_view_setup(PlanifiedPlanningView *self) {
     planified_itinerary_widget_setup(PLANIFIED_ITINERARY_WIDGET(self->selected_day_timetable));
 
     GListModel *model = (GListModel *) planified_task_list_get_model((PlanifiedTaskList *) self->planning_task_list);
-    g_signal_connect(model, "selection-changed", G_CALLBACK(update_details), self);
+    g_signal_connect_swapped(model, "selection-changed", G_CALLBACK(update_details), self);
+    g_signal_connect_swapped(model, "items-changed", G_CALLBACK(update_details), self);
+
     GtkFilter *filter_relevant = (GtkFilter *) gtk_custom_filter_new((GtkCustomFilterFunc) filter_func, self, NULL);
-    GtkSorter *section_sorter = (GtkSorter *) gtk_custom_sorter_new(sort_to_sections,self,NULL);
-    self->filter_relevant = filter_relevant;
-    GListModel *day_model = (GListModel *) gtk_sort_list_model_new((GListModel *) gtk_filter_list_model_new(
-            (GListModel *) planified_app_get_tasks(get_planified_app((GtkWidget *) self)), filter_relevant), NULL);
-    gtk_sort_list_model_set_section_sorter((GtkSortListModel *) day_model, section_sorter);
+    self->section_sorter = (GtkSorter *) gtk_custom_sorter_new(sort_to_sections, self, NULL);
+    self->filter_relevant = filter_relevant; //FIXED?: list headers do not reload between days
+    self->day_model =
+            (GListModel *) gtk_sort_list_model_new(
+                    (GListModel *) gtk_filter_list_model_new(
+                            (GListModel *) planified_app_get_tasks(get_planified_app((GtkWidget *) self)
+                            ), filter_relevant),
+                    NULL);
+    gtk_sort_list_model_set_section_sorter((GtkSortListModel *) self->day_model, self->section_sorter);
+    self->day_model = (GListModel *) gtk_no_selection_new(self->day_model);
     gtk_list_view_set_model((GtkListView *) self->selected_day_list,
-                            (GtkSelectionModel *) gtk_no_selection_new(day_model));
-    update_details(NULL, 0, 0, self);
+                            (GtkSelectionModel *) self->day_model);
+    update_details(self);
     on_date_selected((GtkCalendar *) self->planning_calendar, self);
 
 }
