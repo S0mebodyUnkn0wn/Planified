@@ -491,15 +491,17 @@ planified_task_new(char *task_text,
 }
 
 void planified_task_update_from_sqlite3(PlanifiedTask *self, sqlite3_stmt *fetch_task_stmt) {
-    planified_task_set_task_text(self, sqlite3_column_text(fetch_task_stmt, 1));
-    planified_task_set_deadline(self, MAKE_DATETIME(sqlite3_column_int64(fetch_task_stmt, 2)));
-    planified_task_set_time_req(self, sqlite3_column_int(fetch_task_stmt, 3));
-    planified_task_set_location(self, sqlite3_column_text(fetch_task_stmt, 4));
-    planified_task_set_schedule(self, MAKE_DATETIME(sqlite3_column_int64(fetch_task_stmt, 5)));
-    planified_task_set_is_complete(self, sqlite3_column_int(fetch_task_stmt, 6));
-    planified_task_set_description(self, sqlite3_column_text(fetch_task_stmt, 7));
-    planified_task_set_plan_start(self, MAKE_DATETIME(sqlite3_column_int64(fetch_task_stmt, 8)));
-    planified_task_set_plan_span(self, sqlite3_column_int(fetch_task_stmt, 9));
+    g_object_set(self,
+                 "task-text", sqlite3_column_text(fetch_task_stmt, 1),
+                 "deadline", MAKE_DATETIME(sqlite3_column_int64(fetch_task_stmt, 2)),
+                 "time-req", sqlite3_column_int(fetch_task_stmt, 3),
+                 "location", sqlite3_column_text(fetch_task_stmt, 4),
+                 "schedule", MAKE_DATETIME(sqlite3_column_int64(fetch_task_stmt, 5)),
+                 "is-complete", sqlite3_column_int(fetch_task_stmt, 6),
+                 "description", sqlite3_column_text(fetch_task_stmt, 7),
+                 "plan-start", MAKE_DATETIME(sqlite3_column_int64(fetch_task_stmt, 8)),
+                 "plan-span", sqlite3_column_int(fetch_task_stmt, 9),
+                 NULL);
     self->tag_count = sqlite3_column_int(fetch_task_stmt, 10);
 }
 
