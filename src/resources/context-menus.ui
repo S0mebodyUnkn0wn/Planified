@@ -58,4 +58,12 @@
             </item>
         </section>
     </menu>
+    <menu id="task-list-context-menu">
+        <section>
+            <item>
+                <attribute name="label">_Create task</attribute>
+                <attribute name="action">app.newtask</attribute>
+            </item>
+        </section>
+    </menu>
 </interface>

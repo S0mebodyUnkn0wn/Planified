@@ -19,6 +19,7 @@ struct _PlanifiedTaskList {
     GListModel *filtered_model;
     GListModel *sorted_model;
     GSimpleActionGroup *filter_state;
+    GtkWidget* context_menu;
 };
 
 G_DEFINE_FINAL_TYPE(PlanifiedTaskList, planified_task_list, GTK_TYPE_BOX)
@@ -151,6 +152,19 @@ planified_task_list_get_selected(PlanifiedTaskList *self) {
 }
 
 static void
+context_menu_popup(GtkGestureClick *self,
+                   gint n_press,
+                   gdouble x,
+                   gdouble y,
+                   gpointer user_data) {
+    GtkPopover *context_menu = user_data;
+    g_assert(GTK_IS_POPOVER(context_menu));
+    GdkRectangle rect = {(int) x, (int) y, 0, 0};
+    gtk_popover_set_pointing_to(context_menu, &rect);
+    gtk_popover_popup(context_menu);
+}
+
+static void
 planified_task_list_init(PlanifiedTaskList *self) {
     gtk_widget_init_template((GtkWidget *) self);
     GtkListItemFactory *item_factory = gtk_signal_list_item_factory_new();
@@ -170,13 +184,27 @@ planified_task_list_init(PlanifiedTaskList *self) {
     GtkBuilder *builder = gtk_builder_new_from_resource("/planified/filter-popup-menu.ui");
     gtk_menu_button_set_menu_model(GTK_MENU_BUTTON(self->filters_button),
                                    G_MENU_MODEL(gtk_builder_get_object(builder, "filter-menu")));
+//    g_object_unref(builder);
+    gtk_builder_add_from_resource(builder,"/planified/context-menus.ui", nullptr);
+    GtkGesture *right_click = gtk_gesture_click_new();
+    gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(right_click), GDK_BUTTON_SECONDARY);
+
+    GMenu *menu = g_menu_new();
+    g_menu_append_section(menu, NULL, G_MENU_MODEL(gtk_builder_get_object(builder, "task-list-context-menu")));
+    g_menu_append_submenu(menu, "Set filter", G_MENU_MODEL(gtk_builder_get_object(builder, "filter-menu")));
+    g_menu_append_section(menu, NULL, G_MENU_MODEL(gtk_builder_get_object(builder, "win-context-menu")));
+    gtk_popover_menu_set_menu_model((GtkPopoverMenu *) self->context_menu,
+                                    G_MENU_MODEL(menu));
     g_object_unref(builder);
+
+    g_signal_connect(right_click, "pressed", G_CALLBACK(context_menu_popup), GTK_POPOVER(self->context_menu));
 
     self->list = gtk_list_view_new(NULL, item_factory);
     gtk_widget_add_css_class(self->list, "rich-list");
     gtk_scrollable_set_vscroll_policy((GtkScrollable *) self->list, GTK_SCROLL_NATURAL);
 
     gtk_scrolled_window_set_child((GtkScrolledWindow *) self->task_list_win, self->list);
+    gtk_widget_add_controller(GTK_WIDGET(self), GTK_EVENT_CONTROLLER(right_click));
 
 }
 
@@ -189,6 +217,7 @@ planified_task_list_class_init(PlanifiedTaskListClass *class) {
     gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), PlanifiedTaskList, task_list_win);
 //    gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), PlanifiedTaskList, filters_menu);
     gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), PlanifiedTaskList, filters_button);
+    gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), PlanifiedTaskList, context_menu);
 
 
 }
