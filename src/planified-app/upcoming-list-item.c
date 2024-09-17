@@ -124,6 +124,7 @@ planified_upcoming_list_item_unbind(PlanifiedUpcomingListItem *self) {
     g_assert(PLANIFIED_IS_UPCOMING_LIST_ITEM(self));
 
     g_signal_handlers_disconnect_by_data(self->task, self->description);
+    g_signal_handlers_disconnect_by_data(self->task, self->detail);
     self->task = NULL;
 }
 
