@@ -55,13 +55,25 @@ context_menu_popup(GtkGestureClick *self,
 }
 
 static void
-unschedule_task(GSimpleAction *action,
-                GVariant *parameter,
-                gpointer self) {
+unschedule(PlanifiedTaskContainer *self) {
     PlanifiedTaskContainerPrivate *priv = planified_task_container_get_instance_private(self);
     PlanifiedTask *task = priv->task;
     planified_task_set_schedule(task, NULL);
-    database_update_task(get_handle(self), task, 0);
+    database_update_task(get_handle(GTK_WIDGET(self)), task, 0);
+}
+
+static void
+unschedule_activated(GSimpleAction *action,
+                     GVariant *parameter,
+                     gpointer self) {
+    CommonConfirmDialog *diag = common_confirm_dialog_new(
+            GTK_WINDOW(gtk_widget_get_ancestor(GTK_WIDGET(self), GTK_TYPE_WINDOW)),
+            "Cancel", "Unschedule",
+            "Are you sure?",
+            "Do you want to unschedule the task?");
+    common_confirm_dialog_connect_confirm_callback(diag, G_CALLBACK(unschedule), self);
+    common_confirm_dialog_set_destructive_action(diag, true);
+    gtk_window_present(GTK_WINDOW(diag));
 }
 
 
@@ -138,7 +150,7 @@ static GActionEntry task_action_entries[] =
         {
                 {"delete",     delete_activated,                NULL, NULL, NULL},
                 {"plan",       planified_plan_dialog_activated, NULL, NULL, NULL},
-                {"unschedule", unschedule_task,                 NULL, NULL, NULL},
+                {"unschedule", unschedule_activated,            NULL, NULL, NULL},
                 {"edit",       edit_activated,                  NULL, NULL, NULL},
         };
 
