@@ -84,17 +84,16 @@ static void bind_stmt_from_task(sqlite3_stmt *statement, PlanifiedTask *task) {
     gchar *location = planified_task_get_location(task);
     gchar *description = planified_task_get_description(task);
 
-    g_print("%d", sqlite3_bind_text(statement, 1, task_text, -1, SQLITE_TRANSIENT));
-    g_print("%d", sqlite3_bind_int64(statement, 2, DATETIME_TO_UNIX_S(planified_task_get_deadline(task))));
-    g_print("%d", sqlite3_bind_int(statement, 3, planified_task_get_timereq(task)));
-    g_print("%d", sqlite3_bind_text(statement, 4, location, -1, SQLITE_TRANSIENT));
-    g_print("%d", sqlite3_bind_int64(statement, 5, DATETIME_TO_UNIX_S(planified_task_get_schedule(task))));
-    g_print("%d", sqlite3_bind_int(statement, 6, (int) planified_task_get_is_complete(task)));
-    g_print("%d", sqlite3_bind_text(statement, 7, description, -1, SQLITE_TRANSIENT));
+    sqlite3_bind_text(statement, 1, task_text, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int64(statement, 2, DATETIME_TO_UNIX_S(planified_task_get_deadline(task)));
+    sqlite3_bind_int(statement, 3, planified_task_get_timereq(task));
+    sqlite3_bind_text(statement, 4, location, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int64(statement, 5, DATETIME_TO_UNIX_S(planified_task_get_schedule(task)));
+    sqlite3_bind_int(statement, 6, (int) planified_task_get_is_complete(task));
+    sqlite3_bind_text(statement, 7, description, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int64(statement, 8, DATETIME_TO_UNIX_S(planified_task_get_plan_start(task)));
+    sqlite3_bind_int(statement, 9, planified_task_get_plan_span(task));
 
-//    g_free(task_text);
-//    g_free(location);
-//    g_free(description);
 }
 
 static void bind_stmt_from_tag(sqlite3_stmt *statement, PlanifiedTag *tag) {
@@ -107,8 +106,8 @@ static void bind_stmt_from_tag(sqlite3_stmt *statement, PlanifiedTag *tag) {
 int database_insert_task(sqlite3 *handle, PlanifiedTask *task, gint64 *rowid_ptr) {
     sqlite3_stmt *insert_statement;
     sqlite3_prepare_v2(handle,
-                       "INSERT INTO tasks (task,deadline,timeReq,location,schedule,is_complete,description)"
-                       "VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING rowid;", -1, &insert_statement, NULL);
+                       "INSERT INTO tasks (task,deadline,timeReq,location,schedule,is_complete,description,plan_start,plan_span)"
+                       "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING rowid;", -1, &insert_statement, NULL);
 
 
     bind_stmt_from_task(insert_statement, task);
@@ -125,12 +124,12 @@ int database_update_task(sqlite3 *handle, PlanifiedTask *task, gint64 *rowid_ptr
     sqlite3_stmt *update_statement;
     sqlite3_prepare_v2(handle,
                        "UPDATE tasks "
-                       "SET task = ?, deadline = ?, timeReq = ?, location = ?, schedule = ?, is_complete = ?, description = ?"
+                       "SET task = ?, deadline = ?, timeReq = ?, location = ?, schedule = ?, is_complete = ?, description = ?, plan_start=?, plan_span=?"
                        "WHERE ROWID == ? RETURNING rowid;",
                        -1, &update_statement, NULL);
 //    g_print("Statement code: %d\n",err);
     bind_stmt_from_task(update_statement, task);
-    sqlite3_bind_int64(update_statement, 8, planified_task_get_rowid(task));
+    sqlite3_bind_int64(update_statement, 10, planified_task_get_rowid(task));
 //    g_print("Statement bound\n");
     int status = sqlite3_step(update_statement);
 //    g_print("Statement execd (%d)\n",status);
