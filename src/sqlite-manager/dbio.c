@@ -62,8 +62,16 @@ int init_sqlite_db(sqlite3 **db_pointer, char *DB_FILEPATH) {
                  "tag_count_up AFTER INSERT ON tag_assignments"
                  "BEGIN"
                  "UPDATE tasks SET tag_count = tag_count+1 WHERE task_id=new.taskid;"
-                 "END",
-                 NULL,NULL,NULL);
+                 "END;",
+                 NULL, NULL, NULL);
+
+    sqlite3_exec(*db_pointer,
+                 "CREATE TRIGGER IF NOT EXISTS"
+                 "tag_count_down AFTER DELETE ON tag_assignments"
+                 "BEGIN"
+                 "UPDATE tasks SET tag_count = tag_count-1 WHERE task_id=old.taskid;"
+                 "END;",
+                 NULL, NULL, NULL);
 
     g_print("DB init successful\n");
 //
@@ -214,7 +222,7 @@ int database_link_tag_to_task(sqlite3 *handle, PlanifiedTag *tag, PlanifiedTask 
 int database_unlink_tag_from_task(sqlite3 *handle, PlanifiedTag *tag, PlanifiedTask *task) {
     sqlite3_stmt *unlink_stmt;
     sqlite3_prepare_v2(handle,
-                       "DELETE FORM tag_assignments WHERE (tagname==? AND taskid==?)", -1, &unlink_stmt, NULL);
+                       "DELETE FROM tag_assignments WHERE (tagname==? AND taskid==?);", -1, &unlink_stmt, NULL);
     const gchar *tag_name = planified_tag_get_name(tag);
     gint64 task_id = planified_task_get_rowid(task);
     sqlite3_bind_text(unlink_stmt, 1, tag_name, -1, SQLITE_STATIC);

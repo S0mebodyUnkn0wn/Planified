@@ -29,6 +29,7 @@ struct _PlanifiedNewentryDialog {
     gboolean edit_mode;
     gint tag_count;
     GHashTable *tags; //TODO Implement
+    GList *removed_tags;
     PlanifiedTask *prefill_task;
 };
 
@@ -156,6 +157,13 @@ newtask_confirmed(PlanifiedNewentryDialog *self) {
     planified_task_set_rowid(task, rowid);
 
     // Set tags for newly created task
+    guint l = g_list_length(self->removed_tags);
+    g_print("len %d\n",l);
+    if (l>0 && self->edit_mode){
+        for (guint i =0;i<l;i++){
+            database_unlink_tag_from_task(handle, g_list_nth_data(self->removed_tags,i),task);
+        }
+    }
     for (int i = 0; i < self->tag_count; i++) {
         PlanifiedTagContainer *tag_c = PLANIFIED_TAG_CONTAINER(
                 gtk_flow_box_child_get_child(gtk_flow_box_get_child_at_index((GtkFlowBox *) self->task_tags, i)));
@@ -163,7 +171,6 @@ newtask_confirmed(PlanifiedNewentryDialog *self) {
         database_link_tag_to_task(handle, tag, task);
         g_print("Bound\n");
     }
-
     g_free(description);
     g_object_unref(task);
     gtk_window_close(GTK_WINDOW(self));
@@ -171,6 +178,7 @@ newtask_confirmed(PlanifiedNewentryDialog *self) {
 
 static void
 remove_tag(PlanifiedTagContainer *tag, PlanifiedNewentryDialog *self) {
+    self->removed_tags = g_list_append(self->removed_tags,planified_tag_container_get_tag(tag));
     gtk_flow_box_remove((GtkFlowBox *) self->task_tags, (GtkWidget *) tag);
     self->tag_count--;
 }

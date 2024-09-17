@@ -104,7 +104,7 @@ planified_tag_container_set_property(GObject *object,
 
     switch ((PlanifiedTagContainerProperty) property_id) {
         case TAG:
-            if (self->tag != NULL) {
+            if (PLANIFIED_IS_TAG(self->tag)) {
                 g_signal_handlers_disconnect_by_data(self->tag, self);
                 g_object_unref(self->tag);
             }
