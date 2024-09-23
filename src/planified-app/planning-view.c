@@ -291,7 +291,7 @@ planified_planning_view_init(PlanifiedPlanningView *self) {
     g_signal_connect(self->planning_calendar, "day-selected", G_CALLBACK(on_date_selected), self);
 
 
-    gtk_widget_add_controller(GTK_WIDGET(self), GTK_EVENT_CONTROLLER(drop_target));
+    gtk_widget_add_controller(GTK_WIDGET(self->selected_day_list), GTK_EVENT_CONTROLLER(drop_target));
 
 
 }
@@ -356,6 +356,18 @@ void planified_planning_view_setup(PlanifiedPlanningView *self) {
     update_details(self);
     on_date_selected((GtkCalendar *) self->planning_calendar, self);
 
+//    Glib's datetime api and GtkCalendar are extremely silly, so que crutches:
+//    Otherwise calendar keeps track of time and breaks g_date_time_compare().
+//    This all could be fixed by compare asking for mask of comparison...
+//    GDateTime *now = g_date_time_new_now_local();
+//    GDateTime *yesterday = g_date_time_add_days(now, -1);
+//    GDateTime *now_zeros = g_date_time_new_local(g_date_time_get_year(now),
+//                                                 g_date_time_get_month(now),
+//                                                 g_date_time_get_day_of_month(now),
+//                                                 0, 0, 0);
+//    gtk_calendar_select_day((GtkCalendar *) self->planning_calendar, yesterday);
+//    gtk_calendar_select_day((GtkCalendar *) self->planning_calendar, now_zeros);
+//    g_date_time_unref(now);
 }
 
 
