@@ -1,7 +1,7 @@
 #include <app/app.h>
 #include <gtk/gtk.h>
 #include <sqlite3.h>
-#include <api/dbio.h>
+#include <core/api.h>
 
 struct _PlanifiedApp
 {
