@@ -1,4 +1,4 @@
 
-subdir('app')
 subdir('common')
-subdir('api')
+subdir('core')
+subdir('app')
