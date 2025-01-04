@@ -8,7 +8,7 @@
 #include <gtk/gtk.h>
 #include <sqlite3.h>
 
-#define PLANIFIED_APP_TYPE (planified_app_get_type())
+#define PLANIFIED_TYPE_APP (planified_app_get_type())
 
 G_DECLARE_FINAL_TYPE (PlanifiedApp, planified_app, PLANIFIED, APP, GtkApplication)
 

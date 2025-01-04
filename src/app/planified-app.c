@@ -1,8 +1,8 @@
-#include <app/app.h>
-#include <gtk/gtk.h>
+#include <app/app.h> 
+#include <gtk/gtk.h> 
 #include <sqlite3.h>
 #include <core/api.h>
-
+#include <common/types/event.h>
 struct _PlanifiedApp
 {
 	GtkApplication parent;
@@ -17,13 +17,15 @@ static void
 planified_app_startup(GApplication* app)
 {
 	G_APPLICATION_CLASS(planified_app_parent_class)->startup(app);
+	//self test:
+	planified_event_new();
 
-	PlanifiedApp* self = PLANIFIED_APP(app);
 }
 
 static void
 planified_app_init(PlanifiedApp* self)
 {
+
 }
 
 static void
@@ -49,7 +51,7 @@ planified_app_class_init(PlanifiedAppClass* class)
 PlanifiedApp*
 planified_app_new()
 {
-	return g_object_new(PLANIFIED_APP_TYPE,
+	return g_object_new(PLANIFIED_TYPE_APP,
 	                    "application-id", "com.github.somebodyunknown.planified",
 	                    "resource-base-path", "/planified",
 	                    NULL);
