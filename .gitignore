@@ -1,2 +1,4 @@
 #intelij folder
 /.idea
+/.cache
+compile_commands.json

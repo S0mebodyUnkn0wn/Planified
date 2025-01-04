@@ -1,6 +1,6 @@
 common_types_source = files(
     [
-        'actionable.c',
+        'completable.c',
         'entry.c',
         'event.c',
         'plannable.c',
