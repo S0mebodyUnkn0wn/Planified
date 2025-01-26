@@ -1,0 +1,19 @@
+#ifndef ENUMS_H
+#define ENUMS_H
+#include <gtk/gtk.h>
+
+typedef enum
+{
+	PLANIFIED_TIME_PRECISION_YEAR = 0,
+	PLANIFIED_TIME_PRECISION_MONTH,
+	PLANIFIED_TIME_PRECISION_WEEK,
+	PLANIFIED_TIME_PRECISION_DAY,
+	PLANIFIED_TIME_PRECISION_HOUR,
+	PLANIFIED_TIME_PRECISION_MINUTE,
+	PLANIFIED_TIME_PRECISION_SECOND
+} PlanifiedTimePrecision;
+
+#define PLANIFIED_TYPE_TIME_PRECISION planified_time_precision_get_type()
+GType planified_time_precision_get_type();
+
+#endif //ENUMS_H

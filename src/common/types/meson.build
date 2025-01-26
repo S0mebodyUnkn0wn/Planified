@@ -5,5 +5,6 @@ common_types_source = files(
         'event.c',
         'planable.c',
         'task.c',
+        'enums.c',
     ]
 )
