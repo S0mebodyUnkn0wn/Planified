@@ -103,10 +103,10 @@ planified_entry_init(PlanifiedEntry* self)
 }
 
 PlanifiedEntry*
-planified_entry_new(gchar* name, gchar* description)
+planified_entry_new(gchar* title, gchar* description)
 {
 	return g_object_new(PLANIFIED_TYPE_ENTRY,
-	                    "name", name,
+	                    "title", title,
 	                    "description", description,
 	                    NULL);
 };

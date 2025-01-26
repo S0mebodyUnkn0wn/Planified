@@ -12,7 +12,7 @@ struct _PlanifiedEntryClass
 	GObjectClass parent_class;
 };
 
-PlanifiedEntry* planified_entry_new(gchar* name, gchar* description);
+PlanifiedEntry* planified_entry_new(gchar* title, gchar* description);
 
 
 
