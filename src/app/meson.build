@@ -1,6 +1,7 @@
 app_source = files(
     [
-        'planified-app.c'
+        'planified-app.c',
+        'app-window.c',
     ]
 )
 

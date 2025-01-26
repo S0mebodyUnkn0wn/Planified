@@ -14,7 +14,7 @@ G_DECLARE_FINAL_TYPE(PlanifiedAppWindow, planified_app_window, PLANIFIED, APP_WI
 void 
 planified_app_window_setup(GtkApplicationWindow *self);
 
-PlanifiedAppWindow 
+PlanifiedAppWindow*
 planified_app_window_new(PlanifiedApp *app);
 
 
