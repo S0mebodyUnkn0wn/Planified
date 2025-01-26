@@ -2,7 +2,7 @@
 #define EVENT_H
 #include <gtk/gtk.h>
 #include <common/types/entry.h>
-#include <common/types/plannable.h>
+#include <common/types/planable.h>
 
 G_BEGIN_DECLS
 
@@ -12,8 +12,6 @@ G_DECLARE_DERIVABLE_TYPE(PlanifiedEvent, planified_event, PLANIFIED, EVENT, Plan
 struct _PlanifiedEventClass
 {
 	PlanifiedEntryClass parent_class;
-
-
 };
 
 PlanifiedEvent* planified_event_new(void);

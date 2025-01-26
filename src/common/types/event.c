@@ -16,13 +16,13 @@ typedef enum
 
 // static GParamSpec* obj_properties[N_PROPERTIES] = {NULL,};
 
-static void planified_event_plannable_interface_init(PlanifiedPlannableInterface* iface);
+static void planified_event_planable_interface_init(PlanifiedPlanableInterface* iface);
 
 G_DEFINE_TYPE_WITH_CODE(
 	PlanifiedEvent, planified_event, PLANIFIED_TYPE_ENTRY,
 	G_ADD_PRIVATE(PlanifiedEvent)
-	G_IMPLEMENT_INTERFACE(PLANIFIED_TYPE_PLANNABLE,
-		planified_event_plannable_interface_init)
+	G_IMPLEMENT_INTERFACE(PLANIFIED_TYPE_PLANABLE,
+		planified_event_planable_interface_init)
 )
 
 static void
@@ -71,25 +71,25 @@ planified_event_get_property(GObject* object,
 }
 
 static bool
-planified_event_editable_plan(PlanifiedPlannable* plannable, GDateTime* start_time)
+planified_event_planable_plan(PlanifiedPlanable* planable, GDateTime* start_time, PlanifiedTimePrecision precision)
 {
-	PlanifiedEvent* self = PLANIFIED_EVENT(plannable);
+	PlanifiedEvent* self = PLANIFIED_EVENT(planable);
 	return false;
 }
 
 static bool
-planified_event_plannable_unplan(PlanifiedPlannable* plannable)
+planified_event_planable_unplan(PlanifiedPlanable* planable)
 {
-	PlanifiedEvent* self = PLANIFIED_EVENT(plannable);
+	PlanifiedEvent* self = PLANIFIED_EVENT(planable);
 	return false;
 }
 
 
 static void
-planified_event_plannable_interface_init(PlanifiedPlannableInterface* iface)
+planified_event_planable_interface_init(PlanifiedPlanableInterface* iface)
 {
-	iface->plan = planified_event_editable_plan;
-	iface->unplan = planified_event_plannable_unplan;
+	iface->plan = planified_event_planable_plan;
+	iface->unplan = planified_event_planable_unplan;
 }
 
 static void
@@ -112,7 +112,7 @@ PlanifiedEvent* planified_event_new(void)
 static void
 planified_event_init(PlanifiedEvent* self)
 {
-	g_assert(PLANIFIED_IS_PLANNABLE(self));
-	PlanifiedPlannable* plannable = PLANIFIED_PLANNABLE(self);
-	planified_plannable_unplan(plannable);
+	g_assert(PLANIFIED_IS_PLANABLE(self));
+	PlanifiedPlanable* planable = PLANIFIED_PLANABLE(self);
+	planified_planable_unplan(planable);
 }

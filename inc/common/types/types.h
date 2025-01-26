@@ -4,10 +4,10 @@
 
 #ifndef TYPES_H
 #define TYPES_H
-#include <common/types/completable.h>
-#include <common/types/entry.h>
-#include <common/types/event.h>
-#include <common/types/plannable.h>
-#include <common/types/task.h>
-#include <common/types/types.h>
+#include "completable.h"
+#include "entry.h"
+#include "event.h"
+#include "planable.h"
+#include "task.h"
+#include "enums.h"
 #endif //TYPES_H
