@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<interface>
+    <template class="PlanifiedEntryContainer" parent="GtkBox">
+        <property name="margin-start">10</property>
+        <property name="margin-end">10</property>
+        <!--        <property name="orientation">vertical</property>-->
+        <style>
+            <class name="entry-container"/>
+        </style>
+        <child>
+            <object class="GtkCheckButton" id="complete_button">
+
+            </object>
+        </child>
+        <child>
+            <object class="GtkBox" id="task_info_box">
+                <property name="name">task_info_box</property>
+                <property name="orientation">vertical</property>
+                <property name="halign">start</property>
+                <child>
+                    <object class="GtkLabel" id="title">
+                        <property name="halign">start</property>
+                        <property name="label">err</property>
+                        <style>
+                            <class name="large-font"/>
+                        </style>
+                    </object>
+                </child>
+                <child>
+                    <object class="GtkLabel" id="description">
+<!--                        <property name="label"></property>-->
+                    </object>
+                </child>
+            </object>
+        </child>
+
+    </template>
+</interface>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<gresources>
+    <gresource prefix="/planified/app">
+        <file>entry-list.ui</file>
+        <file>entry-container.ui</file>
+        <file>timetable-view.ui</file>
+        <file>app-window.ui</file>
+        <file>style.css</file>
+    </gresource>
+</gresources>

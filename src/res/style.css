@@ -1,0 +1,24 @@
+
+*{
+    /*background-color: aqua;*/
+}
+
+.debug{
+    background-color: #FF00FF88;
+}
+
+.entry-container #task_info_box{
+
+}
+
+.entry-container check
+{
+    /*background-color: magenta;*/
+    -gtk-icon-size: 1.2em;
+    margin-right: .5em;
+
+}
+
+.large-font{
+    font-size: 130%;
+}
