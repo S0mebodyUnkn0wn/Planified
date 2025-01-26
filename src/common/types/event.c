@@ -5,12 +5,14 @@ typedef struct
 {
 	GDateTime* start_time;
 	guint64 duration;
+	PlanifiedTimePrecision precision;
 } PlanifiedEventPrivate;
 
 typedef enum
 {
 	PROP_START_TIME = 1,
 	PROP_DURATION,
+	PROP_PRECISION,
 	N_PROPERTIES
 } PlanifiedEventProperty;
 
@@ -36,8 +38,8 @@ planified_event_set_property(GObject* object,
 	switch ((PlanifiedEventProperty)prop_id)
 	{
 	case PROP_START_TIME:
-		g_free(priv->start_time);
-		priv->start_time = g_value_dup_object(value);
+		g_free(priv->start_time); //HACK g_free_boxed might be needed
+		priv->start_time = g_value_dup_boxed(value);
 		break;
 	case PROP_DURATION:
 		priv->duration = g_value_get_uint64(value);
@@ -59,7 +61,8 @@ planified_event_get_property(GObject* object,
 	switch ((PlanifiedEventProperty)prop_id)
 	{
 	case PROP_START_TIME:
-		g_value_set_object(value, priv->start_time);
+		// ? will boxed work?
+		g_value_set_boxed(value, priv->start_time);
 		break;
 	case PROP_DURATION:
 		g_value_set_uint64(value, priv->duration);
@@ -99,9 +102,9 @@ planified_event_class_init(PlanifiedEventClass* klass)
 	object_class->set_property = planified_event_set_property;
 	object_class->get_property = planified_event_get_property;
 
-	g_object_class_override_property(object_class, PROP_START_TIME, "start-time");
+	g_object_class_override_property(object_class, PROP_START_TIME, "planned-time");
 	g_object_class_override_property(object_class, PROP_DURATION, "duration");
-
+	g_object_class_override_property(object_class, PROP_PRECISION, "planned-time-precision");
 }
 
 PlanifiedEvent* planified_event_new(void)
